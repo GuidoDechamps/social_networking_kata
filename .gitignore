@@ -1,0 +1,10 @@
+*.class
+*.log
+
+
+# IntelliJ IDEA
+.idea/
+.idea_modules
+out/
+*.iml
+**/.idea
