@@ -22,15 +22,17 @@ version = '1.0'
 jar {
     manifest {
         attributes "Implementation-Title": "Social Kata in java",
-        "Implementation-Version": version
+                "Implementation-Version": version
     }
 }
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
+    compile "com.google.guava:guava:19.0"
     testCompile("org.junit.jupiter:junit-jupiter-api:5.0.0-M2")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.0-M2")
 }
