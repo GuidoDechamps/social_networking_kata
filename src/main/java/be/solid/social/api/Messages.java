@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import java.util.List;
 
 public class Messages implements PublishingService, ReaderService {
-    final ImmutableListMultimap.Builder<String, Message> b = ImmutableListMultimap.builder();
+    private final ImmutableListMultimap.Builder<String, Message> b = ImmutableListMultimap.builder();
 
     @Override
     public void publish(String sender, String content) {
