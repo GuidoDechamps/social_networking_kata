@@ -32,15 +32,14 @@ public class AcceptanceTests {
     @DisplayName("Read timeline")
     @MethodSource("senders")
     void readTimeLine(final String sender, final PublishingService publishingService, final ReaderService readerService) {
-        messagePosts().forEach(input -> publishingService.publish(input.sender, input.message));
-        final List<Message> messages = readerService.read(sender);
-        final List<Message> expectedTimeLine = messagePosts().stream()
-                                                             .filter(x -> x.sender.equals(sender))
-                                                             .map(MessageInput::toMessage)
-                                                             .collect(Collectors.toList());
-        assertIterableEquals(expectedTimeLine, messages);
-    }
+        final List<MessageInput> messagePosts = messagePosts();
+        messagePosts.forEach(input -> publishingService.publish(input.sender, input.message));
 
+        final List<Message> messages = readerService.read(sender);
+
+        final List<Message> expectedTimeLine = getExpectedMessages(sender, messagePosts);
+        assertIterableEquals(expectedTimeLine, messages,"The expected time line did not match the retrieved timeline");
+    }
 
     private static List<MessageInput> messagePosts() {
         return TestScenarios.messagePosts();
@@ -48,6 +47,13 @@ public class AcceptanceTests {
 
     private static List<String> senders() {
         return TestScenarios.senders();
+    }
+
+    private List<Message> getExpectedMessages(String sender, List<MessageInput> messageInputs) {
+        return messageInputs.stream()
+                            .filter(x -> x.sender.equals(sender))
+                            .map(MessageInput::toMessage)
+                            .collect(Collectors.toList());
     }
 
     private void validateSingleMessage(List<Message> allReadMessages, MessageInput expectedMessage) {
