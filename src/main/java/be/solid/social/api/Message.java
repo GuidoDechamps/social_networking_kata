@@ -30,4 +30,9 @@ public class Message {
         result = 31 * result + (content != null ? content.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" + "user='" + user + '\'' + ", content='" + content + '\'' + '}';
+    }
 }
