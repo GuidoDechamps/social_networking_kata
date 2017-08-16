@@ -5,18 +5,18 @@ import be.solid.social.api.Message;
 import be.solid.social.api.PublishingService;
 import be.solid.social.api.ReaderService;
 import be.solid.social.impl.Messages;
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static be.solid.social.TestScenarios.ALICE;
-import static be.solid.social.TestScenarios.CHARLIE;
+import static be.solid.social.TestScenarios.*;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(UseCaseParameterResolver.class)
@@ -66,17 +66,29 @@ public class AcceptanceTests {
     }
 
     @Test()
-    @DisplayName("Wall with  subscriptions")
+    @DisplayName("Wall with subscriptions for Charlie")
     void wallCharlieWithSubscriptions() {
         postAllMessages();
-        publishingService.subscribe(CHARLIE, TestScenarios.ALICE);
+        publishingService.subscribe(CHARLIE, ALICE);
 
         final List<Message> messages = readerService.readWall(CHARLIE);
 
-        final List<Message> expectedMessages = buildExpectedMessages(Lists.newArrayList(ALICE, CHARLIE), allPostsToBeMade());
-        assertIterableEquals(expectedMessages, messages, "The expected time line did not match the retrieved timeline");
+        validateWall(messages, newArrayList(ALICE, CHARLIE));
 
     }
+
+    @Test()
+    @DisplayName("Wall with subscriptions for Alice")
+    void wallAliceWithSubscriptions() {
+        postAllMessages();
+        publishingService.subscribe(ALICE, BOB);
+
+        final List<Message> messages = readerService.readWall(ALICE);
+
+        validateWall(messages, newArrayList(BOB, ALICE));
+
+    }
+
 
     private static List<MessageInput> allPostsToBeMade() {
         return TestScenarios.messagePosts();
@@ -84,6 +96,11 @@ public class AcceptanceTests {
 
     private static List<String> senders() {
         return TestScenarios.senders();
+    }
+
+    private void validateWall(List<Message> messages, ArrayList<String> senders) {
+        final List<Message> expectedMessages = buildExpectedMessages(senders, allPostsToBeMade());
+        assertIterableEquals(expectedMessages, messages, "The expected time line did not match the retrieved timeline");
     }
 
     private void validateUserTimeLine(String sender, List<Message> messages) {
