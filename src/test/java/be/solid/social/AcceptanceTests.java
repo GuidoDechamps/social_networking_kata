@@ -18,13 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Social Kata Acceptance tests")
 public class AcceptanceTests {
 
-
     @ParameterizedTest()
     @DisplayName("Publish single message")
-    @MethodSource("messagePosts")
+    @MethodSource("allPostsToBeMade")
     void postMessage(final MessageInput input, final PublishingService publishingService, final ReaderService readerService) {
         publishingService.publish(input.sender, input.message);
+
         final List<Message> messages = readerService.read(input.sender);
+
         validateSingleMessage(messages, input);
     }
 
@@ -32,16 +33,14 @@ public class AcceptanceTests {
     @DisplayName("Read timeline")
     @MethodSource("senders")
     void readTimeLineFromSender(final String sender, final PublishingService publishingService, final ReaderService readerService) {
-        final List<MessageInput> messagePosts = messagePosts();
-        messagePosts.forEach(input -> publishingService.publish(input.sender, input.message));
+        postAllMessages(publishingService);
 
         final List<Message> messages = readerService.read(sender);
 
-        final List<Message> expectedTimeLine = getExpectedMessages(sender, messagePosts);
-        assertIterableEquals(expectedTimeLine, messages,"The expected time line did not match the retrieved timeline");
+        validateTimeLine(sender, messages);
     }
 
-    private static List<MessageInput> messagePosts() {
+    private static List<MessageInput> allPostsToBeMade() {
         return TestScenarios.messagePosts();
     }
 
@@ -49,7 +48,20 @@ public class AcceptanceTests {
         return TestScenarios.senders();
     }
 
-    private List<Message> getExpectedMessages(String sender, List<MessageInput> messageInputs) {
+    private void validateTimeLine(String sender, List<Message> messages) {
+        final List<Message> expectedTimeLine = buildExpectedMessages(sender);
+        assertIterableEquals(expectedTimeLine, messages, "The expected time line did not match the retrieved timeline");
+    }
+
+    private void postAllMessages(PublishingService publishingService) {
+        allPostsToBeMade().forEach(input -> publishingService.publish(input.sender, input.message));
+    }
+
+    private List<Message> buildExpectedMessages(String sender) {
+        return buildExpectedMessages(sender, allPostsToBeMade());
+    }
+
+    private List<Message> buildExpectedMessages(String sender, List<MessageInput> messageInputs) {
         return messageInputs.stream()
                             .filter(x -> x.sender.equals(sender))
                             .map(MessageInput::toMessage)
