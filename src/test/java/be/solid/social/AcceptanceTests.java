@@ -2,9 +2,9 @@ package be.solid.social;
 
 
 import be.solid.social.api.Message;
+import be.solid.social.impl.Messages;
 import be.solid.social.api.PublishingService;
 import be.solid.social.api.ReaderService;
-import be.solid.social.impl.Messages;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,7 +30,7 @@ public class AcceptanceTests {
     @ParameterizedTest()
     @DisplayName("Publish single message")
     @MethodSource("allPostsToBeMade")
-    void postMessage(final MessageInput input) {
+    void postMessage(final MessageInput input ) {
         publishingService.publish(input.sender, input.message);
 
         final List<Message> messages = readerService.read(input.sender);
@@ -49,6 +49,17 @@ public class AcceptanceTests {
         validateTimeLine(sender, messages);
     }
 
+    @ParameterizedTest()
+    @DisplayName("Wall with no subscriptions")
+    @MethodSource("senders")
+    void wallWithNoSubscriptions(final String sender) {
+        postAllMessages();
+
+        final List<Message> messages = readerService.readWall(sender);
+
+        validateTimeLine(sender, messages);
+
+    }
 
     private static List<MessageInput> allPostsToBeMade() {
         return TestScenarios.messagePosts();

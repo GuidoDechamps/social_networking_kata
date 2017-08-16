@@ -6,7 +6,6 @@ import be.solid.social.api.ReaderService;
 import com.google.common.collect.ImmutableListMultimap;
 
 import java.util.List;
-
 //TODO remove public
 public class Messages implements PublishingService, ReaderService {
     private final ImmutableListMultimap.Builder<String, Message> builder = ImmutableListMultimap.builder();
@@ -22,5 +21,9 @@ public class Messages implements PublishingService, ReaderService {
                       .get(receiver);
     }
 
-
+    @Override
+    public List<Message> readWall(String user) {
+        return builder.build()
+                      .get(user);
+    }
 }

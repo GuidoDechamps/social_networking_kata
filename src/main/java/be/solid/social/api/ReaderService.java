@@ -4,4 +4,6 @@ import java.util.List;
 
 public interface ReaderService {
     List<Message> read(String receiver);
+
+    List<Message> readWall(String user);
 }
