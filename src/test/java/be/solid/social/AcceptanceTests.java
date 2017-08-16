@@ -2,10 +2,12 @@ package be.solid.social;
 
 
 import be.solid.social.api.Message;
-import be.solid.social.impl.Messages;
 import be.solid.social.api.PublishingService;
 import be.solid.social.api.ReaderService;
+import be.solid.social.impl.Messages;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,6 +15,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static be.solid.social.TestScenarios.ALICE;
+import static be.solid.social.TestScenarios.CHARLIE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(UseCaseParameterResolver.class)
@@ -30,7 +34,7 @@ public class AcceptanceTests {
     @ParameterizedTest()
     @DisplayName("Publish single message")
     @MethodSource("allPostsToBeMade")
-    void postMessage(final MessageInput input ) {
+    void postMessage(final MessageInput input) {
         publishingService.publish(input.sender, input.message);
 
         final List<Message> messages = readerService.read(input.sender);
@@ -46,7 +50,7 @@ public class AcceptanceTests {
 
         final List<Message> messages = readerService.read(sender);
 
-        validateTimeLine(sender, messages);
+        validateUserTimeLine(sender, messages);
     }
 
     @ParameterizedTest()
@@ -57,7 +61,20 @@ public class AcceptanceTests {
 
         final List<Message> messages = readerService.readWall(sender);
 
-        validateTimeLine(sender, messages);
+        validateUserTimeLine(sender, messages);
+
+    }
+
+    @Test()
+    @DisplayName("Wall with  subscriptions")
+    void wallCharlieWithSubscriptions() {
+        postAllMessages();
+        publishingService.subscribe(CHARLIE, TestScenarios.ALICE);
+
+        final List<Message> messages = readerService.readWall(CHARLIE);
+
+        final List<Message> expectedMessages = buildExpectedMessages(Lists.newArrayList(ALICE, CHARLIE), allPostsToBeMade());
+        assertIterableEquals(expectedMessages, messages, "The expected time line did not match the retrieved timeline");
 
     }
 
@@ -69,7 +86,7 @@ public class AcceptanceTests {
         return TestScenarios.senders();
     }
 
-    private void validateTimeLine(String sender, List<Message> messages) {
+    private void validateUserTimeLine(String sender, List<Message> messages) {
         final List<Message> expectedTimeLine = buildExpectedMessages(sender);
         assertIterableEquals(expectedTimeLine, messages, "The expected time line did not match the retrieved timeline");
     }
@@ -85,6 +102,13 @@ public class AcceptanceTests {
     private List<Message> buildExpectedMessages(String sender, List<MessageInput> messageInputs) {
         return messageInputs.stream()
                             .filter(x -> x.sender.equals(sender))
+                            .map(MessageInput::toMessage)
+                            .collect(Collectors.toList());
+    }
+
+    private List<Message> buildExpectedMessages(List<String> senders, List<MessageInput> messageInputs) {
+        return messageInputs.stream()
+                            .filter(x -> senders.contains(x.sender))
                             .map(MessageInput::toMessage)
                             .collect(Collectors.toList());
     }
