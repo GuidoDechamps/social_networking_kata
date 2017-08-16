@@ -17,4 +17,9 @@ class MessageInput {
     Message toMessage() {
         return create(sender, message);
     }
+
+    @Override
+    public String toString() {
+        return "MessageInput{" + "sender='" + sender + '\'' + ", message='" + message + '\'' + '}';
+    }
 }
