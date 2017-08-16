@@ -22,7 +22,7 @@ public class AcceptanceTests {
     @ParameterizedTest()
     @DisplayName("Publish single message")
     @MethodSource("messagePosts")
-    void publishSingleStatusUpdate(final MessageInput input, final PublishingService publishingService, final ReaderService readerService) {
+    void postMessage(final MessageInput input, final PublishingService publishingService, final ReaderService readerService) {
         publishingService.publish(input.sender, input.message);
         final List<Message> messages = readerService.read(input.sender);
         validateSingleMessage(messages, input);
@@ -31,7 +31,7 @@ public class AcceptanceTests {
     @ParameterizedTest()
     @DisplayName("Read timeline")
     @MethodSource("senders")
-    void readTimeLine(final String sender, final PublishingService publishingService, final ReaderService readerService) {
+    void readTimeLineFromSender(final String sender, final PublishingService publishingService, final ReaderService readerService) {
         final List<MessageInput> messagePosts = messagePosts();
         messagePosts.forEach(input -> publishingService.publish(input.sender, input.message));
 
