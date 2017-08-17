@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
 import java.lang.reflect.Parameter;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -15,7 +16,9 @@ public class UseCaseParameterResolver implements ParameterResolver {
     private final Map<Class, Supplier<?>> supportedInstances = new HashMap<>();
 
     public UseCaseParameterResolver() {
-        supportedInstances.put(Messages.class, Messages::new);
+        final Clock myClock = new MinuteIncrementClock();
+        supportedInstances.put(MinuteIncrementClock.class, () -> myClock);
+        supportedInstances.put(Messages.class, () -> new Messages(myClock));
     }
 
     @Override

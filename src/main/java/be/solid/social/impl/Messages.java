@@ -6,18 +6,27 @@ import be.solid.social.api.ReaderService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 //TODO remove public
 public class Messages implements PublishingService, ReaderService {
-    private final ImmutableListMultimap.Builder<String, Message> messages = ImmutableListMultimap.builder();
+    private final ImmutableListMultimap.Builder<String, MessagePost> messages = ImmutableListMultimap.builder();
     private final ImmutableListMultimap.Builder<String, String> subscriptions = ImmutableListMultimap.builder();
+    private final Clock clock;
+
+    public Messages(Clock clock) {
+        this.clock = clock;
+    }
 
     @Override
     public void publish(String sender, String content) {
-        messages.put(sender, Message.create(sender, content));
+        final MessagePost messagePost = createMessagePost(sender, content);
+        messages.put(sender, messagePost);
     }
 
     @Override
@@ -27,8 +36,11 @@ public class Messages implements PublishingService, ReaderService {
 
     @Override
     public List<Message> read(String receiver) {
-        return messages.build()
-                       .get(receiver);
+        final ImmutableList<MessagePost> messagePosts = messages.build()
+                                                                .get(receiver);
+        return messagePosts.stream()
+                           .map(this::map)
+                           .collect(Collectors.toList());
     }
 
     @Override
@@ -36,6 +48,22 @@ public class Messages implements PublishingService, ReaderService {
         final ImmutableList<String> topics = subscriptions(user);
         final ImmutableList<String> merged = merge(user, topics);
         return aggregateTopicTimeLines(merged);
+    }
+
+    private MessagePost createMessagePost(String sender, String content) {
+        return MessagePost.newBuilder()
+                          .withUser(sender)
+                          .withContent(content)
+                          .withCreationTime(LocalDateTime.now(clock))
+                          .build();
+    }
+
+    private Message map(MessagePost messagePost) {
+        return Message.newBuilder()
+                      .withContent(messagePost.content)
+                      .withUser(messagePost.user)
+                      .withTime(messagePost.creationTime)
+                      .build();
     }
 
     private ImmutableList<String> merge(String user, ImmutableList<String> topics) {
@@ -48,6 +76,7 @@ public class Messages implements PublishingService, ReaderService {
         return topics.stream()
                      .map(this::read)
                      .flatMap(Collection::stream)
+                     .sorted(Comparator.comparing(o -> o.time))
                      .collect(Collectors.toList());
     }
 

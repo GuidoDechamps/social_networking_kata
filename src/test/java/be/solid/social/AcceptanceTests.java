@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,7 @@ public class AcceptanceTests {
     @ParameterizedTest()
     @DisplayName("Publish single message")
     @MethodSource("allPostsToBeMade")
-    void postMessage(final MessageInput input) {
+    void postMessage(final MessageData input) {
         publishingService.publish(input.sender, input.message);
 
         final List<Message> messages = readerService.read(input.sender);
@@ -85,12 +84,12 @@ public class AcceptanceTests {
 
         final List<Message> messages = readerService.readWall(ALICE);
 
+        printMessages(messages);
         validateWall(messages, newArrayList(BOB, ALICE));
 
     }
 
-
-    private static List<MessageInput> allPostsToBeMade() {
+    private static List<MessageData> allPostsToBeMade() {
         return TestScenarios.messagePosts();
     }
 
@@ -98,49 +97,65 @@ public class AcceptanceTests {
         return TestScenarios.senders();
     }
 
-    private void validateWall(List<Message> messages, ArrayList<String> senders) {
-        final List<Message> expectedMessages = buildExpectedMessages(senders, allPostsToBeMade());
-        assertIterableEquals(expectedMessages, messages, "The expected time line did not match the retrieved timeline");
+    private void printMessages(List<Message> messages) {
+        messages.forEach(System.out::println);
+    }
+
+    private void validateWall(List<Message> messages, List<String> senders) {
+        final List<MessageData> messagesData = extractData(messages);
+        final List<MessageData> expectedMessages = buildExpectedMessages(senders, allPostsToBeMade());
+        assertIterableEquals(expectedMessages, messagesData, "The expected time line did not match the retrieved timeline");
+    }
+
+    private List<MessageData> extractData(List<Message> messages) {
+        return messages.stream()
+                       .map(this::mapToInput)
+                       .collect(Collectors.toList());
     }
 
     private void validateUserTimeLine(String sender, List<Message> messages) {
-        final List<Message> expectedTimeLine = buildExpectedMessages(sender);
-        assertIterableEquals(expectedTimeLine, messages, "The expected time line did not match the retrieved timeline");
+        final List<MessageData> messagesData = extractData(messages);
+        final List<MessageData> expectedTimeLine = buildExpectedMessages(sender);
+        assertIterableEquals(expectedTimeLine, messagesData, "The expected time line did not match the retrieved timeline");
     }
 
     private void postAllMessages() {
         allPostsToBeMade().forEach(input -> publishingService.publish(input.sender, input.message));
     }
 
-    private List<Message> buildExpectedMessages(String sender) {
+    private List<MessageData> buildExpectedMessages(String sender) {
         return buildExpectedMessages(sender, allPostsToBeMade());
     }
 
-    private List<Message> buildExpectedMessages(String sender, List<MessageInput> messageInputs) {
-        return messageInputs.stream()
-                            .filter(x -> x.sender.equals(sender))
-                            .map(MessageInput::toMessage)
-                            .collect(Collectors.toList());
+    //TODO remove
+    private List<MessageData> buildExpectedMessages(String sender, List<MessageData> messageData) {
+        return messageData.stream()
+                          .filter(x -> x.sender.equals(sender))
+                          .collect(Collectors.toList());
     }
 
-    private List<Message> buildExpectedMessages(List<String> senders, List<MessageInput> messageInputs) {
-        return messageInputs.stream()
-                            .filter(x -> senders.contains(x.sender))
-                            .map(MessageInput::toMessage)
-                            .collect(Collectors.toList());
+    private List<MessageData> buildExpectedMessages(List<String> senders, List<MessageData> messageData) {
+        return messageData.stream()
+                          .filter(x -> senders.contains(x.sender))
+                          .collect(Collectors.toList());
     }
 
-    private void validateSingleMessage(List<Message> allReadMessages, MessageInput expectedMessage) {
+    private void validateSingleMessage(List<Message> allReadMessages, MessageData expectedMessage) {
         assertFalse(allReadMessages.isEmpty(), "No messages were present");
         assertAll("single status update message", () -> checkSingleMessage(allReadMessages), () -> checkMessagePresent(allReadMessages, expectedMessage));
     }
 
-    private boolean checkMessagePresent(List<Message> allReadMessages, MessageInput expectedMessage) {
-        return allReadMessages.contains(expectedMessage.toMessage());
+    private boolean checkMessagePresent(List<Message> allReadMessages, MessageData expectedMessage) {
+        final List<MessageData> messagesData = extractData(allReadMessages);
+        return messagesData.contains(expectedMessage);
     }
 
     private void checkSingleMessage(List<Message> allReadMessages) {
         assertTrue(allReadMessages.size() == 1, "Only one message was expected. Found " + allReadMessages);
+    }
+
+    private MessageData mapToInput(Message message) {
+        return new MessageData(message.user, message.content);
     }
 
 }
