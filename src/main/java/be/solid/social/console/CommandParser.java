@@ -7,7 +7,8 @@ class CommandParser {
     private static final String SPACE = " ";
 
     public static Optional<Command> parseCommand(String line) {
-        if (line.startsWith(ARROW)) return Optional.empty();
+        if (isInvalidInput(line)) return Optional.empty();
+        if (isSingleToken(line)) return Optional.of(buildViewTimeLine(line));
 
         final String[] tokens = line.split(ARROW);
         if (commandIsSeparatedByArrow(tokens)) {
@@ -16,10 +17,24 @@ class CommandParser {
         return Optional.empty();
     }
 
+    private static boolean isInvalidInput(String line) {
+        return line.trim()
+                   .isEmpty() || line.startsWith(ARROW);
+    }
+
+    private static boolean isSingleToken(String line) {
+        return line.split(SPACE).length == 1;
+    }
+
+    private static ViewTimeLine buildViewTimeLine(String line) {
+        return ViewTimeLine.newBuilder()
+                           .withUser(line.trim())
+                           .build();
+    }
+
     private static boolean commandIsSeparatedByArrow(String[] tokens) {
         return tokens.length == 2;
     }
-
 
 
     private static Command buildPosting(String[] tokens) {

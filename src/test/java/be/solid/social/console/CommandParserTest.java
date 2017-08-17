@@ -33,7 +33,7 @@ class CommandParserTest {
     }
 
     private static List<String> allUsers() {
-        return TestScenarios.commandLinePosts();
+        return TestScenarios.senders();
     }
 
     private void testParseToCommand(String inputLine, Class<? extends Command> commandClazz) {
