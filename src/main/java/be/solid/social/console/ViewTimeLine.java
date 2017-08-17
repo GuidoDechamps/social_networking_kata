@@ -1,9 +1,9 @@
 package be.solid.social.console;
 
-class Reading implements Command{
+class ViewTimeLine implements Command{
     private final String user;
 
-    private Reading(Builder builder) {
+    private ViewTimeLine(Builder builder) {
         user = builder.user;
     }
 
@@ -22,8 +22,8 @@ class Reading implements Command{
             return this;
         }
 
-        public Reading build() {
-            return new Reading(this);
+        public ViewTimeLine build() {
+            return new ViewTimeLine(this);
         }
     }
 }

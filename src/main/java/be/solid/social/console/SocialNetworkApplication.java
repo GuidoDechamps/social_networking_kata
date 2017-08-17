@@ -1,5 +1,6 @@
 package be.solid.social.console;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 class SocialNetworkApplication {
@@ -11,6 +12,7 @@ class SocialNetworkApplication {
             System.out.println("");
             System.out.println("[SNA] Please enter a command");
             final String line = scanner.nextLine();
+            Optional<Command> command = CommandParser.parseCommand(line);
             System.out.println("[SNA] i read: " + line);
             if(line.equalsIgnoreCase("exit"))
                 break;
