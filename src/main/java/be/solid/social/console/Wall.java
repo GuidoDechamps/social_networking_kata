@@ -1,6 +1,6 @@
 package be.solid.social.console;
 
-class Wall {
+class Wall implements Command{
     private final String user;
 
     private Wall(Builder builder) {

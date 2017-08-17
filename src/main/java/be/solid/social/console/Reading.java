@@ -1,6 +1,6 @@
 package be.solid.social.console;
 
-class Reading {
+class Reading implements Command{
     private final String user;
 
     private Reading(Builder builder) {

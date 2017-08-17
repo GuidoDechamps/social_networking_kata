@@ -1,6 +1,6 @@
 package be.solid.social.console;
 
-class Posting {
+class Posting implements Command{
     private final String content;
     private final String actor;
 

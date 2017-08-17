@@ -1,6 +1,6 @@
 package be.solid.social.console;
 
-class Following {
+class Following implements Command{
     private final String user;
     private final String subscriptionTopic;
 
