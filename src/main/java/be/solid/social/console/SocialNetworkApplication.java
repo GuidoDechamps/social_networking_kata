@@ -18,4 +18,6 @@ class SocialNetworkApplication {
         System.out.println("*************************");
         System.out.println("Stopping SocialNetworkApplication");
     }
+
+
 }
