@@ -90,6 +90,19 @@ public class AcceptanceTests {
 
     }
 
+    @Test()
+    @DisplayName("Wall with subscriptions for Bob")
+    void wallBobWithSubscriptions() {
+        postAllMessages();
+        publishingService.subscribe(BOB, CHARLIE);
+        publishingService.subscribe(BOB, ALICE);
+
+        final List<Message> messages = readerService.readWall(BOB);
+
+        validateWall(messages, newArrayList(CHARLIE,BOB, ALICE));
+
+    }
+
     private static List<MessageData> allPostsToBeMade() {
         return TestScenarios.messagePosts();
     }
@@ -99,9 +112,9 @@ public class AcceptanceTests {
     }
 
 
-    private void validateWall(List<Message> messages, List<String> senders) {
+    private void validateWall(List<Message> messages, List<String> expectedSenders) {
         final List<MessageData> messagesData = extractData(messages);
-        final List<MessageData> expectedMessages = buildExpectedMessages(senders, allPostsToBeMade());
+        final List<MessageData> expectedMessages = buildExpectedMessages(expectedSenders, allPostsToBeMade());
         assertIterableEquals(expectedMessages, messagesData, "The expected time line did not match the retrieved timeline");
     }
 
