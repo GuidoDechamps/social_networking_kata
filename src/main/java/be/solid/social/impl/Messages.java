@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -35,9 +35,9 @@ public class Messages implements PublishingService, ReaderService {
     }
 
     @Override
-    public List<Message> read(String receiver) {
+    public List<Message> read(String user) {
         final ImmutableList<MessagePost> messagePosts = messages.build()
-                                                                .get(receiver);
+                                                                .get(user);
         return messagePosts.stream()
                            .map(this::map)
                            .collect(Collectors.toList());
@@ -54,7 +54,7 @@ public class Messages implements PublishingService, ReaderService {
         return MessagePost.newBuilder()
                           .withUser(sender)
                           .withContent(content)
-                          .withCreationTime(LocalDateTime.now(clock))
+                          .withCreationTime(Instant.now(clock))
                           .build();
     }
 

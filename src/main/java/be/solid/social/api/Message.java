@@ -1,11 +1,11 @@
 package be.solid.social.api;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class Message {
     public final String user;
     public final String content;
-    public final LocalDateTime time;
+    public final Instant time;
 
     private Message(Builder builder) {
         user = builder.user;
@@ -46,7 +46,7 @@ public class Message {
     public static final class Builder {
         private String user;
         private String content;
-        private LocalDateTime time;
+        private Instant time;
 
         private Builder() {
         }
@@ -61,7 +61,7 @@ public class Message {
             return this;
         }
 
-        public Builder withTime(LocalDateTime val) {
+        public Builder withTime(Instant val) {
             time = val;
             return this;
         }

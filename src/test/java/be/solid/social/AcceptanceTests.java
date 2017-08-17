@@ -5,6 +5,7 @@ import be.solid.social.api.Message;
 import be.solid.social.api.PublishingService;
 import be.solid.social.api.ReaderService;
 import be.solid.social.impl.Messages;
+import be.solid.social.impl.PrintMessagesDecorator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,9 +26,10 @@ public class AcceptanceTests {
     private final PublishingService publishingService;
     private final ReaderService readerService;
 
-    public AcceptanceTests(Messages messages) {
+
+    public AcceptanceTests(Messages messages, SecondIncrementClock clock) {
         this.publishingService = messages;
-        this.readerService = messages;
+        this.readerService = PrintMessagesDecorator.decorate(messages, clock);
     }
 
     @ParameterizedTest()
@@ -84,7 +86,6 @@ public class AcceptanceTests {
 
         final List<Message> messages = readerService.readWall(ALICE);
 
-        printMessages(messages);
         validateWall(messages, newArrayList(BOB, ALICE));
 
     }
@@ -97,9 +98,6 @@ public class AcceptanceTests {
         return TestScenarios.senders();
     }
 
-    private void printMessages(List<Message> messages) {
-        messages.forEach(System.out::println);
-    }
 
     private void validateWall(List<Message> messages, List<String> senders) {
         final List<MessageData> messagesData = extractData(messages);

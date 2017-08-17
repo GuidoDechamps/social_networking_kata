@@ -1,12 +1,12 @@
 package be.solid.social.impl;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 class MessagePost {
 
     public final String user;
     public final String content;
-    public final LocalDateTime creationTime;
+    public final Instant creationTime;
 
     private MessagePost(Builder builder) {
         user = builder.user;
@@ -21,7 +21,7 @@ class MessagePost {
     public static final class Builder {
         private String user;
         private String content;
-        private LocalDateTime creationTime;
+        private Instant creationTime;
 
         private Builder() {
         }
@@ -36,7 +36,7 @@ class MessagePost {
             return this;
         }
 
-        public Builder withCreationTime(LocalDateTime val) {
+        public Builder withCreationTime(Instant val) {
             creationTime = val;
             return this;
         }
