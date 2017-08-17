@@ -1,9 +1,9 @@
 package be.solid.social.console;
 
-class Wall implements Command{
+class ViewWall implements Command{
     private final String user;
 
-    private Wall(Builder builder) {
+    private ViewWall(Builder builder) {
         user = builder.user;
     }
 
@@ -22,8 +22,8 @@ class Wall implements Command{
             return this;
         }
 
-        public Wall build() {
-            return new Wall(this);
+        public ViewWall build() {
+            return new ViewWall(this);
         }
     }
 }

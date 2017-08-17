@@ -108,7 +108,7 @@ public class AcceptanceTests {
     }
 
     private static List<String> senders() {
-        return TestScenarios.senders();
+        return TestScenarios.users();
     }
 
 

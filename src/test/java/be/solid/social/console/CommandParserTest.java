@@ -16,24 +16,34 @@ class CommandParserTest {
 
     @ParameterizedTest()
     @DisplayName("Publish single message")
-    @MethodSource("allPostsToBeMade")
+    @MethodSource("commandLinePosts")
     void postParsing(String inputLine) {
         testParseToCommand(inputLine, Posting.class);
     }
 
     @ParameterizedTest()
-    @DisplayName("View TimeLine")
+    @DisplayName("View User TimeLine")
     @MethodSource("allUsers")
     void viewTimeLine(String inputLine) {
         testParseToCommand(inputLine, ViewTimeLine.class);
     }
 
-    private static List<String> allPostsToBeMade() {
+    @ParameterizedTest()
+    @DisplayName("View ViewWall")
+    @MethodSource("allUsers")
+    void viewWall(String inputLine) {
+        testParseToCommand(inputLine, ViewWall.class);
+    }
+
+    private static List<String> commandLinePosts() {
         return TestScenarios.commandLinePosts();
+    }
+    private static List<String> wallCommandForAllUsers() {
+        return TestScenarios.commandLineWall();
     }
 
     private static List<String> allUsers() {
-        return TestScenarios.senders();
+        return TestScenarios.users();
     }
 
     private void testParseToCommand(String inputLine, Class<? extends Command> commandClazz) {
