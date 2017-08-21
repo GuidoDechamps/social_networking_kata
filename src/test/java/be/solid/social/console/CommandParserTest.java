@@ -15,22 +15,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CommandParserTest {
 
     @ParameterizedTest()
-    @DisplayName("Publish single message")
+    @DisplayName("Parse command for publishing single message")
     @MethodSource("commandLinePosts")
     void postParsing(String inputLine) {
         testParseToCommand(inputLine, Posting.class);
     }
 
     @ParameterizedTest()
-    @DisplayName("View User TimeLine")
+    @DisplayName("Parse command for viewing User TimeLine")
     @MethodSource("allUsers")
     void viewTimeLine(String inputLine) {
         testParseToCommand(inputLine, ViewTimeLine.class);
     }
 
     @ParameterizedTest()
-    @DisplayName("View ViewWall")
-    @MethodSource("allUsers")
+    @DisplayName("Parse command for viewing Wall")
+    @MethodSource("wallCommandForAllUsers")
     void viewWall(String inputLine) {
         testParseToCommand(inputLine, ViewWall.class);
     }
@@ -38,6 +38,7 @@ class CommandParserTest {
     private static List<String> commandLinePosts() {
         return TestScenarios.commandLinePosts();
     }
+
     private static List<String> wallCommandForAllUsers() {
         return TestScenarios.commandLineWall();
     }

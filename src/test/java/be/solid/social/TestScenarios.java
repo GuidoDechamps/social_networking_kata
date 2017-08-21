@@ -5,17 +5,19 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static be.solid.social.console.CommandParser.ARROW;
+import static be.solid.social.console.CommandParser.SPACE;
+import static java.time.zone.ZoneOffsetTransitionRule.TimeDefinition.WALL;
+
 public class TestScenarios {
     static final String ALICE = "Alice";
     static final String BOB = "Bob";
     static final String CHARLIE = "Charlie";
-    private static final String ARROW = "->";
     private static final String I_LOVE_THE_WEATHER_TODAY = "I love the weather today";
     private static final String DAMN_WE_LOST = "Damn! We lost! ";
     private static final String GOOD_GAME_THOUGH = "Good game though.";
     private static final String COFFEE_ANYONE = "I'm in New York today! Anyone wants to have a coffee?";
-    private static final String SPACE = " ";
-    private static final String WALL = "wall";
+
 
     private TestScenarios() {
     }

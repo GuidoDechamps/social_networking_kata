@@ -1,20 +1,49 @@
 package be.solid.social.console;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
 import java.util.Optional;
 
-class CommandParser {
+/**
+ * User submits commands to the application:
+ * - Command posting: \<user name> -> \<message>
+ * - Command reading: \<user name>
+ * - Command following: \<user name> follows \<another user>
+ * - Command wall: \<user name> wall
+ */
+public class CommandParser {
     public static final String ARROW = "->";
-    private static final String SPACE = " ";
+    public static final String SPACE = " ";
+    static final String WALL = "wall";
 
     public static Optional<Command> parseCommand(String line) {
         if (isInvalidInput(line)) return Optional.empty();
-        if (isSingleToken(line)) return Optional.of(buildViewTimeLine(line));
 
-        final String[] tokens = line.split(ARROW);
+        final List<String> tokens = splitIntoTokens(line);
+        if (hasSingleToken(tokens)) return Optional.of(buildViewTimeLine(line));
+        if (hasTwoTokens(line)) {
+            if (tokens.get(1)
+                      .equalsIgnoreCase(WALL)) return Optional.of(buildViewTimeLine(line));
+        }
+
+
         if (commandIsSeparatedByArrow(tokens)) {
-            return Optional.of(buildPosting(tokens));
+            return Optional.of(Posting.newBuilder()
+                                      .withActor(tokens.get(0))
+                                      .withContent(tokens.get(1))
+                                      .build());
         }
         return Optional.empty();
+    }
+
+    private static boolean hasSingleToken(List<String> tokens) {
+        return tokens.size() == 1;
+    }
+
+    private static List<String> splitIntoTokens(String line) {
+        final String[] tokens = line.split(SPACE);
+        return Lists.newArrayList(tokens);
     }
 
     private static boolean isInvalidInput(String line) {
@@ -22,8 +51,8 @@ class CommandParser {
                    .isEmpty() || line.startsWith(ARROW);
     }
 
-    private static boolean isSingleToken(String line) {
-        return line.split(SPACE).length == 1;
+    private static boolean hasTwoTokens(String line) {
+        return line.split(SPACE).length == 2;
     }
 
     private static ViewTimeLine buildViewTimeLine(String line) {
@@ -32,15 +61,11 @@ class CommandParser {
                            .build();
     }
 
-    private static boolean commandIsSeparatedByArrow(String[] tokens) {
-        return tokens.length == 2;
+    private static boolean commandIsSeparatedByArrow(List<String> tokens) {
+
+        return tokens.get(1)
+                     .equalsIgnoreCase(ARROW) && tokens.size() > 2;
     }
 
 
-    private static Command buildPosting(String[] tokens) {
-        return Posting.newBuilder()
-                      .withActor(tokens[0])
-                      .withContent(tokens[1])
-                      .build();
-    }
 }
