@@ -24,7 +24,7 @@ public class CommandParser {
         if (hasSingleToken(tokens)) return Optional.of(buildViewTimeLine(line));
         if (hasTwoTokens(line)) {
             if (tokens.get(1)
-                      .equalsIgnoreCase(WALL)) return Optional.of(buildViewTimeLine(line));
+                      .equalsIgnoreCase(WALL)) return Optional.of(buildViewWall(tokens.get(0)));
         }
 
 
@@ -57,6 +57,12 @@ public class CommandParser {
 
     private static ViewTimeLine buildViewTimeLine(String line) {
         return ViewTimeLine.newBuilder()
+                           .withUser(line.trim())
+                           .build();
+    }
+
+    private static ViewWall buildViewWall(String line) {
+        return ViewWall.newBuilder()
                            .withUser(line.trim())
                            .build();
     }
