@@ -1,7 +1,7 @@
 package be.solid.social.console;
 
-class ViewTimeLine implements Command{
-    private final String user;
+class ViewTimeLine implements Command {
+    final String user;
 
     private ViewTimeLine(Builder builder) {
         user = builder.user;

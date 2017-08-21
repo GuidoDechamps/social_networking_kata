@@ -1,7 +1,7 @@
 package be.solid.social.console;
 
-class ViewWall implements Command{
-    private final String user;
+class ViewWall implements Command {
+    final String user;
 
     private ViewWall(Builder builder) {
         user = builder.user;

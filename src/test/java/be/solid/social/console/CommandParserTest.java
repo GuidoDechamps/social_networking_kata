@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @DisplayName("Console Command Parser Test")
@@ -18,21 +19,29 @@ class CommandParserTest {
     @DisplayName("Parse command for publishing single message")
     @MethodSource("commandLinePosts")
     void postParsing(String inputLine) {
-        testParseToCommand(inputLine, Posting.class);
+        final Command command = parseToCommand(inputLine);
+        final Posting posting = convertToCommandType(command, inputLine, Posting.class);
+        assertTrue(inputLine.startsWith(posting.actor), "Invalid actor " + posting.actor);
+        assertTrue(inputLine.endsWith(posting.content), "Invalid content :" + posting.content);
     }
 
     @ParameterizedTest()
     @DisplayName("Parse command for viewing User TimeLine")
     @MethodSource("allUsers")
     void viewTimeLine(String inputLine) {
-        testParseToCommand(inputLine, ViewTimeLine.class);
+        final Command command = parseToCommand(inputLine);
+        final ViewTimeLine viewTimeLine = convertToCommandType(command, inputLine, ViewTimeLine.class);
+        assertTrue(inputLine.startsWith(viewTimeLine.user),"Invalid user " + viewTimeLine.user);
     }
 
     @ParameterizedTest()
     @DisplayName("Parse command for viewing Wall")
     @MethodSource("wallCommandForAllUsers")
     void viewWall(String inputLine) {
-        testParseToCommand(inputLine, ViewWall.class);
+        final Command command = parseToCommand(inputLine);
+        final ViewWall viewWall = convertToCommandType(command, inputLine, ViewWall.class);
+        assertTrue(inputLine.startsWith(viewWall.user),"Invalid user " + viewWall.user);
+
     }
 
     private static List<String> commandLinePosts() {
@@ -47,10 +56,14 @@ class CommandParserTest {
         return TestScenarios.users();
     }
 
-    private void testParseToCommand(String inputLine, Class<? extends Command> commandClazz) {
+    private <T extends Command> T convertToCommandType(Command commandToConvert, String origin, Class<T> expectedCommandClazz) {
+        if (isWrongCommand(expectedCommandClazz, commandToConvert)) fail(buidlWrongCommandMessage(origin, expectedCommandClazz, commandToConvert));
+        return expectedCommandClazz.cast(commandToConvert);
+    }
+
+    private Command parseToCommand(String inputLine) {
         final Optional<Command> parseResult = CommandParser.parseCommand(inputLine);
-        final Command command = parseResult.orElseGet(throwUnableToParseException(inputLine));
-        if (isWrongCommand(commandClazz, command)) fail(buidlWrongCommandMessage(inputLine, commandClazz, command));
+        return parseResult.orElseGet(throwUnableToParseException(inputLine));
     }
 
     private boolean isWrongCommand(Class<? extends Command> commandClazz, Command command) {

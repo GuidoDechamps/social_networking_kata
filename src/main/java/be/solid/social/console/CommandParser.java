@@ -29,9 +29,10 @@ public class CommandParser {
 
 
         if (commandIsSeparatedByArrow(tokens)) {
+            final String[] arrowTokens = line.split(ARROW);
             return Optional.of(Posting.newBuilder()
-                                      .withActor(tokens.get(0))
-                                      .withContent(tokens.get(1))
+                                      .withActor(arrowTokens[0])
+                                      .withContent(arrowTokens[1])
                                       .build());
         }
         return Optional.empty();

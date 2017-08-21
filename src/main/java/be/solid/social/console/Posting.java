@@ -1,8 +1,8 @@
 package be.solid.social.console;
 
 class Posting implements Command{
-    private final String content;
-    private final String actor;
+     final String content;
+     final String actor;
 
     private Posting(Builder builder) {
         content = builder.content;
@@ -34,4 +34,5 @@ class Posting implements Command{
             return new Posting(this);
         }
     }
+
 }
