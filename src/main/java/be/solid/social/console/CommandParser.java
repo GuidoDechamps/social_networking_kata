@@ -5,6 +5,9 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 /**
  * User submits commands to the application:
  * - Command posting: \<user name> -> \<message>
@@ -15,27 +18,35 @@ import java.util.Optional;
 public class CommandParser {
     public static final String ARROW = "->";
     public static final String SPACE = " ";
+    public static final String FOLLOWS = "follow";
     static final String WALL = "wall";
 
     public static Optional<Command> parseCommand(String line) {
-        if (isInvalidInput(line)) return Optional.empty();
+        if (isInvalidInput(line)) return empty();
 
         final List<String> tokens = splitIntoTokens(line);
-        if (hasSingleToken(tokens)) return Optional.of(buildViewTimeLine(line));
+        if (hasSingleToken(tokens)) return of(buildViewTimeLine(line));
         if (hasTwoTokens(line)) {
             if (tokens.get(1)
-                      .equalsIgnoreCase(WALL)) return Optional.of(buildViewWall(tokens.get(0)));
+                      .equalsIgnoreCase(WALL)) return of(buildViewWall(tokens.get(0)));
         }
 
 
         if (commandIsSeparatedByArrow(tokens)) {
             final String[] arrowTokens = line.split(ARROW);
-            return Optional.of(Posting.newBuilder()
-                                      .withActor(arrowTokens[0])
-                                      .withContent(arrowTokens[1])
-                                      .build());
+            return of(Posting.newBuilder()
+                             .withActor(arrowTokens[0])
+                             .withContent(arrowTokens[1])
+                             .build());
         }
-        return Optional.empty();
+        if (commandIsSeparatedByFollows(tokens)) {
+            final String[] arrowTokens = line.split(FOLLOWS);
+            return of(Following.newBuilder()
+                               .withUser(arrowTokens[0])
+                               .withSubscriptionTopic(arrowTokens[1])
+                               .build());
+        }
+        return empty();
     }
 
     private static boolean hasSingleToken(List<String> tokens) {
@@ -64,14 +75,21 @@ public class CommandParser {
 
     private static ViewWall buildViewWall(String line) {
         return ViewWall.newBuilder()
-                           .withUser(line.trim())
-                           .build();
+                       .withUser(line.trim())
+                       .build();
     }
 
     private static boolean commandIsSeparatedByArrow(List<String> tokens) {
+        return isSeparatedBy(tokens, ARROW);
+    }
 
-        return tokens.get(1)
-                     .equalsIgnoreCase(ARROW) && tokens.size() > 2;
+    private static boolean commandIsSeparatedByFollows(List<String> tokens) {
+        return isSeparatedBy(tokens, FOLLOWS);
+    }
+
+    private static boolean isSeparatedBy(List<String> tokens, String separator) {
+        return tokens.size() > 2 && tokens.get(1)
+                                          .equalsIgnoreCase(separator);
     }
 
 

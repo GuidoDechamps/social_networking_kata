@@ -5,8 +5,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static be.solid.social.console.CommandParser.ARROW;
-import static be.solid.social.console.CommandParser.SPACE;
+import static be.solid.social.console.CommandParser.*;
 import static java.time.zone.ZoneOffsetTransitionRule.TimeDefinition.WALL;
 
 public class TestScenarios {
@@ -26,6 +25,16 @@ public class TestScenarios {
         return messagePosts().stream()
                              .map(x -> (x.sender + SPACE + ARROW + SPACE + x.message))
                              .collect(Collectors.toList());
+    }
+
+    public static List<String> commandLineFollows() {
+        return ImmutableList.<String>builder().add(ALICE + SPACE + FOLLOWS + SPACE + BOB)
+                                              .add(ALICE + SPACE + FOLLOWS + SPACE + CHARLIE)
+                                              .add(BOB + SPACE + FOLLOWS + SPACE + ALICE)
+                                              .add(BOB + SPACE + FOLLOWS + SPACE + CHARLIE)
+                                              .add(CHARLIE + SPACE + FOLLOWS + SPACE + ALICE)
+                                              .add(CHARLIE + SPACE + FOLLOWS + SPACE + BOB)
+                                              .build();
     }
 
     public static List<String> users() {

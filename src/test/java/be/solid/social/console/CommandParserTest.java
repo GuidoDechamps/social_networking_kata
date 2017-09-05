@@ -16,22 +16,36 @@ import static org.junit.jupiter.api.Assertions.fail;
 class CommandParserTest {
 
     @ParameterizedTest()
-    @DisplayName("Parse command for publishing single message")
+    @DisplayName("Parse command for posting single message")
     @MethodSource("commandLinePosts")
     void postParsing(String inputLine) {
         final Command command = parseToCommand(inputLine);
+
         final Posting posting = convertToCommandType(command, inputLine, Posting.class);
         assertTrue(inputLine.startsWith(posting.actor), "Invalid actor " + posting.actor);
         assertTrue(inputLine.endsWith(posting.content), "Invalid content :" + posting.content);
     }
 
     @ParameterizedTest()
-    @DisplayName("Parse command for viewing User TimeLine")
+    @DisplayName("Parse command for users following users")
+    @MethodSource("commandLineFollows")
+    void followParsing(String inputLine) {
+        final Command command = parseToCommand(inputLine);
+
+        final Following posting = convertToCommandType(command, inputLine, Following.class);
+        assertTrue(inputLine.startsWith(posting.user), "Invalid user " + posting.user);
+        assertTrue(inputLine.endsWith(posting.subscriptionTopic), "Invalid user subscription :" + posting.subscriptionTopic);
+
+    }
+
+    @ParameterizedTest()
+    @DisplayName("Parse command for reading/viewing a User TimeLine")
     @MethodSource("allUsers")
     void viewTimeLine(String inputLine) {
         final Command command = parseToCommand(inputLine);
+
         final ViewTimeLine viewTimeLine = convertToCommandType(command, inputLine, ViewTimeLine.class);
-        assertTrue(inputLine.startsWith(viewTimeLine.user),"Invalid user " + viewTimeLine.user);
+        assertTrue(inputLine.startsWith(viewTimeLine.user), "Invalid user " + viewTimeLine.user);
     }
 
     @ParameterizedTest()
@@ -39,13 +53,18 @@ class CommandParserTest {
     @MethodSource("wallCommandForAllUsers")
     void viewWall(String inputLine) {
         final Command command = parseToCommand(inputLine);
+
         final ViewWall viewWall = convertToCommandType(command, inputLine, ViewWall.class);
-        assertTrue(inputLine.startsWith(viewWall.user),"Invalid user " + viewWall.user);
+        assertTrue(inputLine.startsWith(viewWall.user), "Invalid user " + viewWall.user);
 
     }
 
     private static List<String> commandLinePosts() {
         return TestScenarios.commandLinePosts();
+    }
+
+    private static List<String> commandLineFollows() {
+        return TestScenarios.commandLineFollows();
     }
 
     private static List<String> wallCommandForAllUsers() {
@@ -72,11 +91,11 @@ class CommandParserTest {
 
     private String buidlWrongCommandMessage(String inputLine, Class<? extends Command> commandClazz, Command command) {
         final String notCorrectCommandMessage = buildNotCorrectCommandMessage(inputLine, commandClazz);
-        final String actualComandMessage = buildActualComandMessage(command);
-        return notCorrectCommandMessage + actualComandMessage;
+        final String actualCommandMessage = buildActualCommandMessage(command);
+        return notCorrectCommandMessage + actualCommandMessage;
     }
 
-    private String buildActualComandMessage(Command command) {
+    private String buildActualCommandMessage(Command command) {
         return "It was a " + command.getClass()
                                     .getSimpleName() + " command.";
     }
