@@ -19,27 +19,29 @@ public class CommandParser {
     public static final String ARROW = "->";
     public static final String SPACE = " ";
     public static final String FOLLOWS = "follow";
-    static final String WALL = "wall";
+    public static final String WALL = "wall";
 
     public static Optional<Command> parseCommand(String line) {
         if (isInvalidInput(line)) return empty();
 
-        final List<String> tokens = splitIntoTokens(line);
-        if (hasSingleToken(tokens)) return of(buildViewTimeLine(line));
-        if (hasTwoTokens(line)) {
-            if (tokens.get(1)
-                      .equalsIgnoreCase(WALL)) return of(buildViewWall(tokens.get(0)));
+        final Tokens tokens = new Tokens(line);
+        if (tokens.hasSingleToken()) return of(buildViewTimeLine(line));
+        if (tokens.hasTwoTokens()) {
+            if (tokens.doesSecondTokenMatch(WALL)) {
+                final String first = tokens.getFirst();
+                return of(buildViewWall(first));
+            }
         }
 
 
-        if (commandIsSeparatedByArrow(tokens)) {
+        if (tokens.isCommandSeparatedByArrow()) {
             final String[] arrowTokens = line.split(ARROW);
             return of(Posting.newBuilder()
                              .withActor(arrowTokens[0])
                              .withContent(arrowTokens[1])
                              .build());
         }
-        if (commandIsSeparatedByFollows(tokens)) {
+        if (tokens.isCommandSeparatedByFollows()) {
             final String[] arrowTokens = line.split(FOLLOWS);
             return of(Following.newBuilder()
                                .withUser(arrowTokens[0])
@@ -49,47 +51,80 @@ public class CommandParser {
         return empty();
     }
 
-    private static boolean hasSingleToken(List<String> tokens) {
-        return tokens.size() == 1;
-    }
-
-    private static List<String> splitIntoTokens(String line) {
-        final String[] tokens = line.split(SPACE);
-        return Lists.newArrayList(tokens);
-    }
-
     private static boolean isInvalidInput(String line) {
         return line.trim()
                    .isEmpty() || line.startsWith(ARROW);
     }
 
-    private static boolean hasTwoTokens(String line) {
-        return line.split(SPACE).length == 2;
-    }
 
-    private static ViewTimeLine buildViewTimeLine(String line) {
+    private static ViewTimeLine buildViewTimeLine(String user) {
         return ViewTimeLine.newBuilder()
-                           .withUser(line.trim())
+                           .withUser(user.trim())
                            .build();
     }
 
-    private static ViewWall buildViewWall(String line) {
+    private static ViewWall buildViewWall(String user) {
         return ViewWall.newBuilder()
-                       .withUser(line.trim())
+                       .withUser(user.trim())
                        .build();
     }
 
-    private static boolean commandIsSeparatedByArrow(List<String> tokens) {
-        return isSeparatedBy(tokens, ARROW);
-    }
 
-    private static boolean commandIsSeparatedByFollows(List<String> tokens) {
-        return isSeparatedBy(tokens, FOLLOWS);
-    }
+    private static class Tokens {
 
-    private static boolean isSeparatedBy(List<String> tokens, String separator) {
-        return tokens.size() > 2 && tokens.get(1)
-                                          .equalsIgnoreCase(separator);
+        private final List<String> tokens;
+
+
+        private Tokens(String lineToParse) {
+            this.tokens = splitIntoTokens(lineToParse);
+        }
+
+        public Optional<String> get(int i) {
+            if (i < 0 || i > tokens.size()) return empty();
+            else return of(tokens.get(i));
+        }
+
+        public String getFirst() {
+            if (tokens.isEmpty()) throw new RuntimeException("No tokens available");
+            else return tokens.get(0);
+        }
+
+        private static List<String> splitIntoTokens(String line) {
+            final String[] tokens = line.split(SPACE);
+            return Lists.newArrayList(tokens);
+        }
+
+        private boolean doesTokenMatch(int index, String token) {
+            return tokens.get(index)
+                         .equalsIgnoreCase(token);
+        }
+
+        private boolean doesSecondTokenMatch(String token) {
+            return doesTokenMatch(1, token);
+        }
+
+        private boolean hasSingleToken() {
+            return tokens.size() == 1;
+        }
+
+
+        private boolean hasTwoTokens() {
+            return tokens.size() == 2;
+        }
+
+        private boolean isCommandSeparatedByArrow() {
+            return isSeparatedBy(ARROW);
+        }
+
+        private boolean isCommandSeparatedByFollows() {
+            return isSeparatedBy(FOLLOWS);
+        }
+
+        private boolean isSeparatedBy(String separator) {
+            return tokens.size() > 2 && tokens.get(1)
+                                              .equalsIgnoreCase(separator);
+        }
+
     }
 
 
