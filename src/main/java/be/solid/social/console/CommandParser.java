@@ -1,8 +1,5 @@
 package be.solid.social.console;
 
-import com.google.common.collect.Lists;
-
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.empty;
@@ -24,36 +21,49 @@ public class CommandParser {
     public static Optional<Command> parseCommand(String line) {
         if (isInvalidInput(line)) return empty();
 
-        final Tokens tokens = new Tokens(line);
-        if (tokens.hasSingleToken()) return of(buildViewTimeLine(line));
+        final Tokens tokens = Tokens.create(line, SPACE);
+        return buildCommand(tokens);
+    }
+
+    private static Optional<Command> buildCommand(Tokens tokens) {
+        if (tokens.hasSingleToken()) return of(buildViewTimeLine(tokens.getFirst()));
         if (tokens.hasTwoTokens()) {
             if (tokens.doesSecondTokenMatch(WALL)) {
-                final String first = tokens.getFirst();
-                return of(buildViewWall(first));
+                return of(buildViewWallCommand(tokens));
             }
         }
 
 
-        if (tokens.doesSecondTokenMatch(ARROW)) {
-            final String asStringFrom = tokens.getContentAfterSecondToken();
-            return of(Posting.newBuilder()
-                             .withActor(tokens.getFirst())
-                             .withContent(asStringFrom)
-                             .build());
-        }
-        if (tokens.doesSecondTokenMatch(FOLLOWS)) {
-            final String[] follows = line.split(FOLLOWS);
-            return of(Following.newBuilder()
-                               .withUser(follows[0])
-                               .withSubscriptionTopic(follows[1])
-                               .build());
-        }
+        if (tokens.doesSecondTokenMatch(ARROW)) return of(buildPostCommand(tokens));
+
+        if (tokens.doesSecondTokenMatch(FOLLOWS)) return of(buildFollowingCommand(tokens));
+
         return empty();
+    }
+
+    private static ViewWall buildViewWallCommand(Tokens tokens) {
+        final String first = tokens.getFirst();
+        return buildViewWall(first);
+    }
+
+    private static Posting buildPostCommand(Tokens tokens) {
+        final String content = tokens.getContentAfterSecondToken();
+        return Posting.newBuilder()
+                      .withActor(tokens.getFirst())
+                      .withContent(content)
+                      .build();
+    }
+
+    private static Following buildFollowingCommand(Tokens tokens) {
+        return Following.newBuilder()
+                        .withUser(tokens.getFirst())
+                        .withSubscriptionTopic(tokens.getThird())
+                        .build();
     }
 
     private static boolean isInvalidInput(String line) {
         return line.trim()
-                   .isEmpty() || line.startsWith(ARROW);
+                   .isEmpty() || line.startsWith(ARROW) || line.startsWith(FOLLOWS) || line.startsWith(WALL);
     }
 
 
@@ -67,63 +77,6 @@ public class CommandParser {
         return ViewWall.newBuilder()
                        .withUser(user.trim())
                        .build();
-    }
-
-
-    private static class Tokens {
-
-        private static final int FIRST_TOKEN_INDEX = 0;
-        private static final int SECOND_TOKEN_INDEX = 1;
-        private final List<String> tokens;
-        private final String sourceLine;
-
-
-        private Tokens(String lineToParse) {
-            this.sourceLine = lineToParse;
-            this.tokens = splitIntoTokens(lineToParse);
-        }
-
-        public String get(int index) {
-            if (index < FIRST_TOKEN_INDEX || index > tokens.size()) throw new RuntimeException("No token on index " + index);
-            else return tokens.get(index);
-        }
-
-        public String getFirst() {
-            if (tokens.isEmpty()) throw new RuntimeException("No tokens available");
-            else return tokens.get(FIRST_TOKEN_INDEX);
-        }
-
-
-        public String getContentAfterSecondToken() {
-            final String s = get(SECOND_TOKEN_INDEX);
-            final int i = sourceLine.indexOf(s);
-            return sourceLine.substring(i + s.length());
-        }
-
-        private static List<String> splitIntoTokens(String line) {
-            final String[] tokens = line.split(SPACE);
-            return Lists.newArrayList(tokens);
-        }
-
-        private boolean doesTokenMatch(int index, String token) {
-            return tokens.get(index)
-                         .equalsIgnoreCase(token);
-        }
-
-        private boolean doesSecondTokenMatch(String token) {
-            return doesTokenMatch(SECOND_TOKEN_INDEX, token);
-        }
-
-        private boolean hasSingleToken() {
-            return tokens.size() == 1;
-        }
-
-
-        private boolean hasTwoTokens() {
-            return tokens.size() == 2;
-        }
-
-
     }
 
 
