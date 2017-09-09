@@ -35,10 +35,10 @@ public class CommandParser {
 
 
         if (tokens.doesSecondTokenMatch(ARROW)) {
-            final Optional<String> asStringFrom = tokens.getAsStringFrom(1, ARROW);
+            final String asStringFrom = tokens.getContentAfterSecondToken();
             return of(Posting.newBuilder()
                              .withActor(tokens.getFirst())
-                             .withContent(asStringFrom.get())
+                             .withContent(asStringFrom)
                              .build());
         }
         if (tokens.doesSecondTokenMatch(FOLLOWS)) {
@@ -72,6 +72,8 @@ public class CommandParser {
 
     private static class Tokens {
 
+        private static final int FIRST_TOKEN_INDEX = 0;
+        private static final int SECOND_TOKEN_INDEX = 1;
         private final List<String> tokens;
         private final String sourceLine;
 
@@ -82,25 +84,20 @@ public class CommandParser {
         }
 
         public String get(int index) {
-            if (index < 0 || index > tokens.size()) throw new RuntimeException("No token on index " + index);
+            if (index < FIRST_TOKEN_INDEX || index > tokens.size()) throw new RuntimeException("No token on index " + index);
             else return tokens.get(index);
         }
 
         public String getFirst() {
             if (tokens.isEmpty()) throw new RuntimeException("No tokens available");
-            else return tokens.get(0);
+            else return tokens.get(FIRST_TOKEN_INDEX);
         }
 
-        public String getThird() {
-            return get(2);
-        }
 
-        public Optional<String> getAsStringFrom(int index, String token) {
-            final String s = get(index);
-            if (token.equals(s)) {
-                final int i = sourceLine.indexOf(s);
-                return of(sourceLine.substring(i));
-            } else return Optional.empty();
+        public String getContentAfterSecondToken() {
+            final String s = get(SECOND_TOKEN_INDEX);
+            final int i = sourceLine.indexOf(s);
+            return sourceLine.substring(i + s.length());
         }
 
         private static List<String> splitIntoTokens(String line) {
@@ -114,7 +111,7 @@ public class CommandParser {
         }
 
         private boolean doesSecondTokenMatch(String token) {
-            return doesTokenMatch(1, token);
+            return doesTokenMatch(SECOND_TOKEN_INDEX, token);
         }
 
         private boolean hasSingleToken() {
@@ -126,10 +123,6 @@ public class CommandParser {
             return tokens.size() == 2;
         }
 
-        private boolean isSeparatedBy(String separator) {
-            return tokens.size() > 2 && tokens.get(1)
-                                              .equalsIgnoreCase(separator);
-        }
 
     }
 

@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static be.solid.social.console.CommandParser.ARROW;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Console Command Parser Test")
 class CommandParserTest {
@@ -22,8 +22,8 @@ class CommandParserTest {
         final Command command = parseToCommand(inputLine);
 
         final Posting posting = convertToCommandType(command, inputLine, Posting.class);
-        assertTrue(inputLine.startsWith(posting.actor), "Invalid actor " + posting.actor);
-        assertTrue(inputLine.endsWith(posting.content), "Invalid content :" + posting.content);
+
+        validatePostCommand(inputLine, posting);
     }
 
     @ParameterizedTest()
@@ -73,6 +73,12 @@ class CommandParserTest {
 
     private static List<String> allUsers() {
         return TestScenarios.users();
+    }
+
+    private void validatePostCommand(String inputLine, Posting posting) {
+        assertTrue(inputLine.startsWith(posting.actor), "Invalid actor " + posting.actor);
+        assertFalse(posting.content.startsWith(ARROW), "Invalid content :" + posting.content);
+        assertTrue(inputLine.endsWith(posting.content), "Invalid content :" + posting.content);
     }
 
     private <T extends Command> T convertToCommandType(Command commandToConvert, String origin, Class<T> expectedCommandClazz) {
