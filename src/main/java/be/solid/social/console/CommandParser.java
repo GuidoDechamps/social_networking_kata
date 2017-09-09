@@ -34,18 +34,18 @@ public class CommandParser {
         }
 
 
-        if (tokens.isCommandSeparatedByArrow()) {
-            final String[] arrowTokens = line.split(ARROW);
+        if (tokens.doesSecondTokenMatch(ARROW)) {
+            final Optional<String> asStringFrom = tokens.getAsStringFrom(1, ARROW);
             return of(Posting.newBuilder()
-                             .withActor(arrowTokens[0])
-                             .withContent(arrowTokens[1])
+                             .withActor(tokens.getFirst())
+                             .withContent(asStringFrom.get())
                              .build());
         }
-        if (tokens.isCommandSeparatedByFollows()) {
-            final String[] arrowTokens = line.split(FOLLOWS);
+        if (tokens.doesSecondTokenMatch(FOLLOWS)) {
+            final String[] follows = line.split(FOLLOWS);
             return of(Following.newBuilder()
-                               .withUser(arrowTokens[0])
-                               .withSubscriptionTopic(arrowTokens[1])
+                               .withUser(follows[0])
+                               .withSubscriptionTopic(follows[1])
                                .build());
         }
         return empty();
@@ -73,20 +73,34 @@ public class CommandParser {
     private static class Tokens {
 
         private final List<String> tokens;
+        private final String sourceLine;
 
 
         private Tokens(String lineToParse) {
+            this.sourceLine = lineToParse;
             this.tokens = splitIntoTokens(lineToParse);
         }
 
-        public Optional<String> get(int i) {
-            if (i < 0 || i > tokens.size()) return empty();
-            else return of(tokens.get(i));
+        public String get(int index) {
+            if (index < 0 || index > tokens.size()) throw new RuntimeException("No token on index " + index);
+            else return tokens.get(index);
         }
 
         public String getFirst() {
             if (tokens.isEmpty()) throw new RuntimeException("No tokens available");
             else return tokens.get(0);
+        }
+
+        public String getThird() {
+            return get(2);
+        }
+
+        public Optional<String> getAsStringFrom(int index, String token) {
+            final String s = get(index);
+            if (token.equals(s)) {
+                final int i = sourceLine.indexOf(s);
+                return of(sourceLine.substring(i));
+            } else return Optional.empty();
         }
 
         private static List<String> splitIntoTokens(String line) {
@@ -110,14 +124,6 @@ public class CommandParser {
 
         private boolean hasTwoTokens() {
             return tokens.size() == 2;
-        }
-
-        private boolean isCommandSeparatedByArrow() {
-            return isSeparatedBy(ARROW);
-        }
-
-        private boolean isCommandSeparatedByFollows() {
-            return isSeparatedBy(FOLLOWS);
         }
 
         private boolean isSeparatedBy(String separator) {
