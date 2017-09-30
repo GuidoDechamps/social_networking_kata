@@ -48,10 +48,10 @@ public class TestScenarios {
     }
 
     static List<MessageData> messagePosts() {
-        return ImmutableList.<MessageData>builder().add(new MessageData(ALICE, I_LOVE_THE_WEATHER_TODAY))
-                                                   .add(new MessageData(BOB, DAMN_WE_LOST))
-                                                   .add(new MessageData(BOB, GOOD_GAME_THOUGH))
-                                                   .add(new MessageData(CHARLIE, COFFEE_ANYONE))
+        return ImmutableList.<MessageData>builder().add(new MessageData(1, ALICE, I_LOVE_THE_WEATHER_TODAY))
+                                                   .add(new MessageData(2, BOB, DAMN_WE_LOST))
+                                                   .add(new MessageData(3, BOB, GOOD_GAME_THOUGH))
+                                                   .add(new MessageData(4, CHARLIE, COFFEE_ANYONE))
                                                    .build();
     }
 }

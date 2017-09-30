@@ -6,6 +6,7 @@ import be.solid.social.api.PublishingService;
 import be.solid.social.api.ReaderService;
 import be.solid.social.impl.Messages;
 import be.solid.social.impl.PrintMessagesDecorator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,12 +26,19 @@ public class AcceptanceTests {
     private final PublishingService publishingService;
     private final ReaderService readerService;
     private final WallValidator wallValidator;
+    private final SecondIncrementClock clock;
 
 
     public AcceptanceTests(Messages messages, SecondIncrementClock clock) {
         this.publishingService = messages;
+        this.clock = clock;
         this.readerService = PrintMessagesDecorator.decorate(messages, clock);
         this.wallValidator = new WallValidator(messagePosts());
+    }
+
+    @BeforeEach
+    void init() {
+       clock.reset();
     }
 
     @ParameterizedTest()
@@ -141,9 +149,15 @@ public class AcceptanceTests {
     }
 
 
-    private void validateSingleMessage(List<Message> allReadMessages, MessageData expectedMessage) {
-        assertFalse(allReadMessages.isEmpty(), "No messages were present");
-        assertAll("single status update message", () -> checkSingleMessage(allReadMessages), () -> checkMessagePresent(allReadMessages, expectedMessage));
+    private void validateSingleMessage(List<Message> allReadMessages, MessageData originalInputData) {
+        checkSingleMessage(allReadMessages);
+        final Message message = allReadMessages.get(0);
+
+        final Message expectedMessage = buildExpectedMessage(originalInputData, 1);
+        assertEquals(originalInputData.sender, message.user);
+        assertEquals(originalInputData.message, message.content);
+        assertEquals(expectedMessage.time, message.time);
+
     }
 
     private boolean checkMessagePresent(List<Message> allReadMessages, MessageData expectedMessage) {
@@ -152,10 +166,19 @@ public class AcceptanceTests {
     }
 
     private void checkSingleMessage(List<Message> allReadMessages) {
+        assertFalse(allReadMessages.isEmpty(), "No messages were present");
         assertTrue(allReadMessages.size() == 1, "Only one message was expected. Found " + allReadMessages);
     }
 
     private MessageData mapToInput(Message message) {
-        return new MessageData(message.user, message.content);
+        return new MessageData(0, message.user, message.content);
+    }
+
+    private Message buildExpectedMessage(MessageData message, int messageIndex) {
+        return Message.newBuilder()
+                      .withUser(message.sender)
+                      .withContent(message.message)
+                      .withTime(clock.getPostTime(messageIndex -1))
+                      .build();
     }
 }

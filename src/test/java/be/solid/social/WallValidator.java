@@ -21,25 +21,23 @@ class WallValidator {
     }
 
     private void validateWall(List<Message> messages, List<String> expectedSenders) {
-        final List<MessageData> messagesData = extractData(messages);
-        final List<MessageData> expectedMessages = buildExpectedMessages(expectedSenders);
-        assertIterableEquals(expectedMessages, messagesData, "The expected time line did not match the retrieved timeline");
+        final List<String> messagesData = extractSenders(messages);
+        final List<String> s = buildWallFromExpectedSenders(expectedSenders);
+        assertIterableEquals(s, messagesData, "The expected time line did not match the retrieved timeline");
     }
 
-    private List<MessageData> extractData(List<Message> messages) {
-        return messages.stream()
-                       .map(this::mapToInput)
+    private List<String> buildWallFromExpectedSenders(List<String> expectedSenders) {
+        return allPosts.stream()
+                       .map(x -> x.sender)
+                       .filter(expectedSenders::contains)
                        .collect(Collectors.toList());
     }
 
-    private List<MessageData> buildExpectedMessages(List<String> senders) {
-        return allPosts.stream()
-                          .filter(x -> senders.contains(x.sender))
-                          .collect(Collectors.toList());
+    private List<String> extractSenders(List<Message> messages) {
+        return messages.stream()
+                       .map(x -> x.user)
+                       .collect(Collectors.toList());
     }
 
 
-    private MessageData mapToInput(Message message) {
-        return new MessageData(message.user, message.content);
-    }
 }

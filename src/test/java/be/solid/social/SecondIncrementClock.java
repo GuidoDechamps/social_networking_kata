@@ -25,10 +25,22 @@ public class SecondIncrementClock extends Clock {
 
     @Override
     public Instant instant() {
-        return creationTime.plusSeconds(secondIncrement * sequenceNr++);
+        return getPostTime(sequenceNr++);
     }
 
     public Instant getFinalTime() {
-        return creationTime.plusSeconds(secondIncrement * sequenceNr);
+        return getPostTime(sequenceNr);
+    }
+
+    public Instant getStartTime() {
+        return creationTime;
+    }
+
+    public Instant getPostTime(int nrOfPost) {
+        return creationTime.plusSeconds(secondIncrement * nrOfPost);
+    }
+
+    public void reset() {
+        sequenceNr = 0;
     }
 }
