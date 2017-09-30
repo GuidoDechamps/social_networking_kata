@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static be.solid.social.TestScenarios.*;
-import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(UseCaseParameterResolver.class)
@@ -25,11 +24,13 @@ public class AcceptanceTests {
 
     private final PublishingService publishingService;
     private final ReaderService readerService;
+    private final WallValidator wallValidator;
 
 
     public AcceptanceTests(Messages messages, SecondIncrementClock clock) {
         this.publishingService = messages;
         this.readerService = PrintMessagesDecorator.decorate(messages, clock);
+        this.wallValidator = new WallValidator(messagePosts());
     }
 
     @ParameterizedTest()
@@ -74,7 +75,7 @@ public class AcceptanceTests {
 
         final List<Message> messages = readerService.readWall(CHARLIE);
 
-        validateWall(messages, newArrayList(ALICE, CHARLIE));
+        wallValidator.validate(messages, ALICE, CHARLIE);
 
     }
 
@@ -86,7 +87,7 @@ public class AcceptanceTests {
 
         final List<Message> messages = readerService.readWall(ALICE);
 
-        validateWall(messages, newArrayList(BOB, ALICE));
+        wallValidator.validate(messages, BOB, ALICE);
 
     }
 
@@ -99,7 +100,7 @@ public class AcceptanceTests {
 
         final List<Message> messages = readerService.readWall(BOB);
 
-        validateWall(messages, newArrayList(CHARLIE,BOB, ALICE));
+        wallValidator.validate(messages, CHARLIE, BOB, ALICE);
 
     }
 
@@ -111,12 +112,6 @@ public class AcceptanceTests {
         return TestScenarios.users();
     }
 
-
-    private void validateWall(List<Message> messages, List<String> expectedSenders) {
-        final List<MessageData> messagesData = extractData(messages);
-        final List<MessageData> expectedMessages = buildExpectedMessages(expectedSenders, allPostsToBeMade());
-        assertIterableEquals(expectedMessages, messagesData, "The expected time line did not match the retrieved timeline");
-    }
 
     private List<MessageData> extractData(List<Message> messages) {
         return messages.stream()
@@ -145,11 +140,6 @@ public class AcceptanceTests {
                           .collect(Collectors.toList());
     }
 
-    private List<MessageData> buildExpectedMessages(List<String> senders, List<MessageData> messageData) {
-        return messageData.stream()
-                          .filter(x -> senders.contains(x.sender))
-                          .collect(Collectors.toList());
-    }
 
     private void validateSingleMessage(List<Message> allReadMessages, MessageData expectedMessage) {
         assertFalse(allReadMessages.isEmpty(), "No messages were present");
@@ -168,5 +158,4 @@ public class AcceptanceTests {
     private MessageData mapToInput(Message message) {
         return new MessageData(message.user, message.content);
     }
-
 }
