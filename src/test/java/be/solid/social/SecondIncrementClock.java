@@ -4,7 +4,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
-public class SecondIncrementClock extends Clock {
+public class SecondIncrementClock extends Clock implements TestClock{
     private final int secondIncrement;
     private final Instant creationTime = Instant.now();
     private int sequenceNr = 0;

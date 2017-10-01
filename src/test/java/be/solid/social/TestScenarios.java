@@ -22,9 +22,9 @@ public class TestScenarios {
     }
 
     public static List<String> commandLinePosts() {
-        return messagePosts().stream()
-                             .map(x -> (x.sender + SPACE + ARROW + SPACE + x.message))
-                             .collect(Collectors.toList());
+        return sequenceOfPosts().stream()
+                                .map(x -> (x.sender + SPACE + ARROW + SPACE + x.message))
+                                .collect(Collectors.toList());
     }
 
     public static List<String> commandLineFollows() {
@@ -47,11 +47,19 @@ public class TestScenarios {
                       .collect(Collectors.toList());
     }
 
-    static List<MessageData> messagePosts() {
+    static List<MessageData> sequenceOfPosts() {
         return ImmutableList.<MessageData>builder().add(new MessageData(1, ALICE, I_LOVE_THE_WEATHER_TODAY))
                                                    .add(new MessageData(2, BOB, DAMN_WE_LOST))
                                                    .add(new MessageData(3, BOB, GOOD_GAME_THOUGH))
                                                    .add(new MessageData(4, CHARLIE, COFFEE_ANYONE))
+                                                   .build();
+    }
+
+    static List<MessageData> individualPosts() {
+        return ImmutableList.<MessageData>builder().add(new MessageData(1, ALICE, I_LOVE_THE_WEATHER_TODAY))
+                                                   .add(new MessageData(1, BOB, DAMN_WE_LOST))
+                                                   .add(new MessageData(1, BOB, GOOD_GAME_THOUGH))
+                                                   .add(new MessageData(1, CHARLIE, COFFEE_ANYONE))
                                                    .build();
     }
 }

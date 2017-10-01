@@ -1,13 +1,13 @@
 package be.solid.social;
 
 class MessageData {
-    final int messageSequence;
+    final int messageSequenceNumber;
     final String sender;
     final String message;
 
 
-    MessageData(int messageSequence, String sender, String message) {
-        this.messageSequence = messageSequence;
+    MessageData(int messageSequenceNumber, String sender, String message) {
+        this.messageSequenceNumber = messageSequenceNumber;
         this.sender = sender;
         this.message = message;
     }

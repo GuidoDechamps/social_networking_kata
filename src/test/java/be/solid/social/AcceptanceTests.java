@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static be.solid.social.TestScenarios.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @ExtendWith(UseCaseParameterResolver.class)
 @DisplayName("Social Kata Acceptance tests")
@@ -26,35 +26,38 @@ public class AcceptanceTests {
     private final PublishingService publishingService;
     private final ReaderService readerService;
     private final WallValidator wallValidator;
+    private final MessageValidator singleMessageValidator;
     private final SecondIncrementClock clock;
 
 
     public AcceptanceTests(Messages messages, SecondIncrementClock clock) {
         this.publishingService = messages;
+        final MessageFactory messageFactory = new MessageFactory(clock);
+        this.singleMessageValidator = new MessageValidator(messageFactory);
         this.clock = clock;
         this.readerService = PrintMessagesDecorator.decorate(messages, clock);
-        this.wallValidator = new WallValidator(messagePosts());
+        this.wallValidator = new WallValidator(sequenceOfPosts());
     }
 
     @BeforeEach
     void init() {
-       clock.reset();
+        clock.reset();
     }
 
     @ParameterizedTest()
     @DisplayName("Publish single message")
-    @MethodSource("allPostsToBeMade")
+    @MethodSource("individualPosts")
     void postMessage(final MessageData input) {
         publishingService.publish(input.sender, input.message);
 
         final List<Message> messages = readerService.read(input.sender);
 
-        validateSingleMessage(messages, input);
+        singleMessageValidator.validateSingleMessage(messages, input);
     }
 
     @ParameterizedTest()
     @DisplayName("Read timeline")
-    @MethodSource("senders")
+    @MethodSource("users")
     void readTimeLineFromSender(final String sender) {
         postAllMessages();
 
@@ -65,7 +68,7 @@ public class AcceptanceTests {
 
     @ParameterizedTest()
     @DisplayName("Wall with no subscriptions")
-    @MethodSource("senders")
+    @MethodSource("users")
     void wallWithNoSubscriptions(final String sender) {
         postAllMessages();
 
@@ -113,10 +116,14 @@ public class AcceptanceTests {
     }
 
     private static List<MessageData> allPostsToBeMade() {
-        return TestScenarios.messagePosts();
+        return TestScenarios.sequenceOfPosts();
     }
 
-    private static List<String> senders() {
+    private static List<MessageData> individualPosts() {
+        return TestScenarios.individualPosts();
+    }
+
+    private static List<String> users() {
         return TestScenarios.users();
     }
 
@@ -130,7 +137,7 @@ public class AcceptanceTests {
     private void validateUserTimeLine(String sender, List<Message> messages) {
         final List<MessageData> messagesData = extractData(messages);
         final List<MessageData> expectedTimeLine = buildExpectedMessages(sender);
-        assertIterableEquals(expectedTimeLine, messagesData, "The expected time line did not match the retrieved timeline");
+        assertIterableEquals(expectedTimeLine, messagesData, "The expected user time line did not match the retrieved timeline");
     }
 
     private void postAllMessages() {
@@ -149,36 +156,9 @@ public class AcceptanceTests {
     }
 
 
-    private void validateSingleMessage(List<Message> allReadMessages, MessageData originalInputData) {
-        checkSingleMessage(allReadMessages);
-        final Message message = allReadMessages.get(0);
-
-        final Message expectedMessage = buildExpectedMessage(originalInputData, 1);
-        assertEquals(originalInputData.sender, message.user);
-        assertEquals(originalInputData.message, message.content);
-        assertEquals(expectedMessage.time, message.time);
-
-    }
-
-    private boolean checkMessagePresent(List<Message> allReadMessages, MessageData expectedMessage) {
-        final List<MessageData> messagesData = extractData(allReadMessages);
-        return messagesData.contains(expectedMessage);
-    }
-
-    private void checkSingleMessage(List<Message> allReadMessages) {
-        assertFalse(allReadMessages.isEmpty(), "No messages were present");
-        assertTrue(allReadMessages.size() == 1, "Only one message was expected. Found " + allReadMessages);
-    }
-
     private MessageData mapToInput(Message message) {
         return new MessageData(0, message.user, message.content);
     }
 
-    private Message buildExpectedMessage(MessageData message, int messageIndex) {
-        return Message.newBuilder()
-                      .withUser(message.sender)
-                      .withContent(message.message)
-                      .withTime(clock.getPostTime(messageIndex -1))
-                      .build();
-    }
+
 }

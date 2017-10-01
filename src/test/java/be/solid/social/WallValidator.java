@@ -23,7 +23,7 @@ class WallValidator {
     private void validateWall(List<Message> messages, List<String> expectedSenders) {
         final List<String> messagesData = extractSenders(messages);
         final List<String> s = buildWallFromExpectedSenders(expectedSenders);
-        assertIterableEquals(s, messagesData, "The expected time line did not match the retrieved timeline");
+        assertIterableEquals(s, messagesData, "The expected wall timeline did not match the retrieved wall");
     }
 
     private List<String> buildWallFromExpectedSenders(List<String> expectedSenders) {
