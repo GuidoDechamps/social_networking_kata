@@ -1,12 +1,13 @@
-package be.solid.social;
+package be.solid.social.validators;
 
+import be.solid.social.MessageData;
 import be.solid.social.api.Message;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MessageValidator {
+public class MessageValidator {
     private final ExpectedMessageFactory expectedMessageFactory;
 
     MessageValidator(ExpectedMessageFactory expectedMessageFactory) {
@@ -20,7 +21,7 @@ class MessageValidator {
         assertEquals(expectedMessage.time, message.time);
     }
 
-    void validateSingleMessage(List<Message> allReadMessages, MessageData originalInputData) {
+    public void validateSingleMessage(List<Message> allReadMessages, MessageData originalInputData) {
         checkSingleMessage(allReadMessages);
         final Message message = allReadMessages.get(0);
         validate(originalInputData, message);

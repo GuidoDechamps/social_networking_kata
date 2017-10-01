@@ -6,6 +6,10 @@ import be.solid.social.api.PublishingService;
 import be.solid.social.api.ReaderService;
 import be.solid.social.impl.Messages;
 import be.solid.social.impl.PrintMessagesDecorator;
+import be.solid.social.validators.MessageValidator;
+import be.solid.social.validators.TimeLineValidator;
+import be.solid.social.validators.ValidatorFactory;
+import be.solid.social.validators.WallValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,10 +37,11 @@ public class AcceptanceTests {
         this.publishingService = messages;
         this.readerService = PrintMessagesDecorator.decorate(messages, clock);
         this.clock = clock;
-        final ExpectedMessageFactory expectedMessageFactory = new ExpectedMessageFactory(clock);
-        this.singleMessageValidator = new MessageValidator(expectedMessageFactory);
-        this.timeLineValidator = new TimeLineValidator(sequenceOfPosts(), expectedMessageFactory);
-        this.wallValidator = new WallValidator(sequenceOfPosts());
+
+        final ValidatorFactory validatorFactory = new ValidatorFactory(clock);
+        this.singleMessageValidator = validatorFactory.createSingleMessageValidator();
+        this.timeLineValidator = validatorFactory.createTimeLineValidator(sequenceOfPosts());
+        this.wallValidator = validatorFactory.createWallValidator(sequenceOfPosts());
     }
 
     @BeforeEach

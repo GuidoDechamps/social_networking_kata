@@ -1,9 +1,9 @@
 package be.solid.social;
 
-class MessageData {
-    final int messageSequenceNumber;
-    final String sender;
-    final String message;
+public class MessageData {
+    public final int messageSequenceNumber;
+    public final String sender;
+    public final String message;
 
 
     MessageData(int messageSequenceNumber, String sender, String message) {

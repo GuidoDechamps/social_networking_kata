@@ -1,5 +1,6 @@
-package be.solid.social;
+package be.solid.social.validators;
 
+import be.solid.social.MessageData;
 import be.solid.social.api.Message;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.stream.Collectors;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-class WallValidator {
+public class WallValidator {
 
     private final List<MessageData> allPosts;
 
@@ -16,7 +17,7 @@ class WallValidator {
         this.allPosts = allPosts;
     }
 
-    void validate(List<Message> messages, String... expectedSenders) {
+    public void validate(List<Message> messages, String... expectedSenders) {
         validateWall(messages, newArrayList(expectedSenders));
     }
 

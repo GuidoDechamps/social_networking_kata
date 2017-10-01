@@ -1,5 +1,6 @@
-package be.solid.social;
+package be.solid.social.validators;
 
+import be.solid.social.MessageData;
 import be.solid.social.api.Message;
 
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-class TimeLineValidator {
+public class TimeLineValidator {
 
     private final List<MessageData> allPosts;
     private final ExpectedMessageFactory expectedMessageFactory;
@@ -18,7 +19,7 @@ class TimeLineValidator {
     }
 
 
-    void validate(String subjectOfWallCommand, List<Message> resultFromWallCommand) {
+   public void validate(String subjectOfWallCommand, List<Message> resultFromWallCommand) {
         final List<Message> expectedTimeLine = buildExpectedMessages(subjectOfWallCommand);
         assertIterableEquals(expectedTimeLine, resultFromWallCommand, "The expected user time line did not match the retrieved timeline");
     }
