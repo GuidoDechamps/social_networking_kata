@@ -24,7 +24,7 @@ public class Messages implements PublishingService, ReaderService {
     }
 
     @Override
-    public void publish(String sender, String content) {
+    public void post(String sender, String content) {
         final MessagePost messagePost = createMessagePost(sender, content);
         messages.put(sender, messagePost);
     }

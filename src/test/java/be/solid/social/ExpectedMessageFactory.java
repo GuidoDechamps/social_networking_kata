@@ -2,11 +2,11 @@ package be.solid.social;
 
 import be.solid.social.api.Message;
 
-class MessageFactory {
+class ExpectedMessageFactory {
 
     private final TestClock clock;
 
-    MessageFactory(TestClock clock) {
+    ExpectedMessageFactory(TestClock clock) {
         this.clock = clock;
     }
 

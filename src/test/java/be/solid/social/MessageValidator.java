@@ -7,14 +7,14 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MessageValidator {
-    private final MessageFactory messageFactory;
+    private final ExpectedMessageFactory expectedMessageFactory;
 
-    MessageValidator(MessageFactory messageFactory) {
-        this.messageFactory = messageFactory;
+    MessageValidator(ExpectedMessageFactory expectedMessageFactory) {
+        this.expectedMessageFactory = expectedMessageFactory;
     }
 
     public void validate(MessageData originalMessageData, Message message) {
-        final Message expectedMessage = messageFactory.buildExpectedMessage(originalMessageData);
+        final Message expectedMessage = expectedMessageFactory.buildExpectedMessage(originalMessageData);
         assertEquals(originalMessageData.sender, message.user);
         assertEquals(originalMessageData.message, message.content);
         assertEquals(expectedMessage.time, message.time);

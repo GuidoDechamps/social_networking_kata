@@ -14,10 +14,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static be.solid.social.TestScenarios.*;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 @ExtendWith(UseCaseParameterResolver.class)
 @DisplayName("Social Kata Acceptance tests")
@@ -27,15 +25,17 @@ public class AcceptanceTests {
     private final ReaderService readerService;
     private final WallValidator wallValidator;
     private final MessageValidator singleMessageValidator;
+    private final TimeLineValidator timeLineValidator;
     private final SecondIncrementClock clock;
 
 
     public AcceptanceTests(Messages messages, SecondIncrementClock clock) {
         this.publishingService = messages;
-        final MessageFactory messageFactory = new MessageFactory(clock);
-        this.singleMessageValidator = new MessageValidator(messageFactory);
-        this.clock = clock;
         this.readerService = PrintMessagesDecorator.decorate(messages, clock);
+        this.clock = clock;
+        final ExpectedMessageFactory expectedMessageFactory = new ExpectedMessageFactory(clock);
+        this.singleMessageValidator = new MessageValidator(expectedMessageFactory);
+        this.timeLineValidator = new TimeLineValidator(sequenceOfPosts(), expectedMessageFactory);
         this.wallValidator = new WallValidator(sequenceOfPosts());
     }
 
@@ -45,10 +45,10 @@ public class AcceptanceTests {
     }
 
     @ParameterizedTest()
-    @DisplayName("Publish single message")
+    @DisplayName("Post single message")
     @MethodSource("individualPosts")
     void postMessage(final MessageData input) {
-        publishingService.publish(input.sender, input.message);
+        publishingService.post(input.sender, input.message);
 
         final List<Message> messages = readerService.read(input.sender);
 
@@ -57,24 +57,24 @@ public class AcceptanceTests {
 
     @ParameterizedTest()
     @DisplayName("Read timeline")
-    @MethodSource("users")
+    @MethodSource("senders")
     void readTimeLineFromSender(final String sender) {
         postAllMessages();
 
         final List<Message> messages = readerService.read(sender);
 
-        validateUserTimeLine(sender, messages);
+        timeLineValidator.validate(sender, messages);
     }
 
     @ParameterizedTest()
     @DisplayName("Wall with no subscriptions")
-    @MethodSource("users")
+    @MethodSource("senders")
     void wallWithNoSubscriptions(final String sender) {
         postAllMessages();
 
         final List<Message> messages = readerService.readWall(sender);
 
-        validateUserTimeLine(sender, messages);
+        timeLineValidator.validate(sender, messages);
 
     }
 
@@ -123,41 +123,13 @@ public class AcceptanceTests {
         return TestScenarios.individualPosts();
     }
 
-    private static List<String> users() {
+    private static List<String> senders() {
         return TestScenarios.users();
     }
 
 
-    private List<MessageData> extractData(List<Message> messages) {
-        return messages.stream()
-                       .map(this::mapToInput)
-                       .collect(Collectors.toList());
-    }
-
-    private void validateUserTimeLine(String sender, List<Message> messages) {
-        final List<MessageData> messagesData = extractData(messages);
-        final List<MessageData> expectedTimeLine = buildExpectedMessages(sender);
-        assertIterableEquals(expectedTimeLine, messagesData, "The expected user time line did not match the retrieved timeline");
-    }
-
     private void postAllMessages() {
-        allPostsToBeMade().forEach(input -> publishingService.publish(input.sender, input.message));
-    }
-
-    private List<MessageData> buildExpectedMessages(String sender) {
-        return buildExpectedMessages(sender, allPostsToBeMade());
-    }
-
-    //TODO remove
-    private List<MessageData> buildExpectedMessages(String sender, List<MessageData> messageData) {
-        return messageData.stream()
-                          .filter(x -> x.sender.equals(sender))
-                          .collect(Collectors.toList());
-    }
-
-
-    private MessageData mapToInput(Message message) {
-        return new MessageData(0, message.user, message.content);
+        allPostsToBeMade().forEach(input -> publishingService.post(input.sender, input.message));
     }
 
 
