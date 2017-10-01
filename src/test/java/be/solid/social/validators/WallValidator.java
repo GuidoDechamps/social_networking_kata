@@ -1,7 +1,7 @@
 package be.solid.social.validators;
 
 import be.solid.social.MessageData;
-import be.solid.social.api.Message;
+import be.solid.social.domain.Message;
 
 import java.util.List;
 import java.util.stream.Collectors;

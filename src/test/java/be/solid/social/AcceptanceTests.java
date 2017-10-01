@@ -1,9 +1,9 @@
 package be.solid.social;
 
 
-import be.solid.social.api.Message;
-import be.solid.social.api.PublishingService;
-import be.solid.social.api.ReaderService;
+import be.solid.social.domain.Message;
+import be.solid.social.domain.PublishingService;
+import be.solid.social.domain.ReaderService;
 import be.solid.social.impl.Messages;
 import be.solid.social.impl.PrintMessagesDecorator;
 import be.solid.social.validators.MessageValidator;

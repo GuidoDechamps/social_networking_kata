@@ -1,8 +1,8 @@
 package be.solid.social.impl;
 
 import be.solid.social.SecondIncrementClock;
-import be.solid.social.api.Message;
-import be.solid.social.api.ReaderService;
+import be.solid.social.domain.Message;
+import be.solid.social.domain.ReaderService;
 
 import java.util.List;
 

@@ -82,7 +82,7 @@ class CommandParserTest {
     }
 
     private <T extends Command> T convertToCommandType(Command commandToConvert, String origin, Class<T> expectedCommandClazz) {
-        if (isWrongCommand(expectedCommandClazz, commandToConvert)) fail(buidlWrongCommandMessage(origin, expectedCommandClazz, commandToConvert));
+        if (isWrongCommand(expectedCommandClazz, commandToConvert)) fail(buildWrongCommandMessage(origin, expectedCommandClazz, commandToConvert));
         return expectedCommandClazz.cast(commandToConvert);
     }
 
@@ -95,7 +95,7 @@ class CommandParserTest {
         return !commandClazz.isInstance(command);
     }
 
-    private String buidlWrongCommandMessage(String inputLine, Class<? extends Command> commandClazz, Command command) {
+    private String buildWrongCommandMessage(String inputLine, Class<? extends Command> commandClazz, Command command) {
         final String notCorrectCommandMessage = buildNotCorrectCommandMessage(inputLine, commandClazz);
         final String actualCommandMessage = buildActualCommandMessage(command);
         return notCorrectCommandMessage + actualCommandMessage;

@@ -32,5 +32,7 @@ public class SocialNetworkApplication {
         command.ifPresent(x -> System.out.println("[SNA] parsed to command: " + x.toString()));
     }
 
+    private static void launchCommand(Command c) {
 
+    }
 }

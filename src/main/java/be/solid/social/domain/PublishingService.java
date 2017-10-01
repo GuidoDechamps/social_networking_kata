@@ -1,4 +1,4 @@
-package be.solid.social.api;
+package be.solid.social.domain;
 
 public interface PublishingService {
     void post(String sender, String content);

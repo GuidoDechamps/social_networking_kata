@@ -2,7 +2,7 @@ package be.solid.social.validators;
 
 import be.solid.social.MessageData;
 import be.solid.social.TestClock;
-import be.solid.social.api.Message;
+import be.solid.social.domain.Message;
 
 class ExpectedMessageFactory {
 
