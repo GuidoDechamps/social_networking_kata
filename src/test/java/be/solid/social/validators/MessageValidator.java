@@ -16,9 +16,7 @@ public class MessageValidator {
 
     public void validate(MessageData originalMessageData, Message message) {
         final Message expectedMessage = expectedMessageFactory.buildExpectedMessage(originalMessageData);
-        assertEquals(originalMessageData.sender, message.user);
-        assertEquals(originalMessageData.message, message.content);
-        assertEquals(expectedMessage.time, message.time);
+        assertEquals(expectedMessage, message);
     }
 
     public void validateSingleMessage(List<Message> allReadMessages, MessageData originalInputData) {

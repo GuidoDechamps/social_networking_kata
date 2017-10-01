@@ -19,7 +19,7 @@ public class ValidatorFactory {
     }
 
     public WallValidator createWallValidator(List<MessageData> allMessages) {
-        return new WallValidator(allMessages);
+        return new WallValidator(expectedMessageFactory, allMessages);
     }
 
     public MessageValidator createSingleMessageValidator() {

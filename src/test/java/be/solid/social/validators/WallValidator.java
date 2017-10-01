@@ -10,10 +10,11 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 public class WallValidator {
-
+    private final ExpectedMessageFactory expectedMessageFactory;
     private final List<MessageData> allPosts;
 
-    WallValidator(List<MessageData> allPosts) {
+    WallValidator(ExpectedMessageFactory expectedMessageFactory, List<MessageData> allPosts) {
+        this.expectedMessageFactory = expectedMessageFactory;
         this.allPosts = allPosts;
     }
 
@@ -21,22 +22,15 @@ public class WallValidator {
         validateWall(messages, newArrayList(expectedSenders));
     }
 
-    private void validateWall(List<Message> messages, List<String> expectedSenders) {
-        final List<String> messagesData = extractSenders(messages);
-        final List<String> s = buildWallFromExpectedSenders(expectedSenders);
-        assertIterableEquals(s, messagesData, "The expected wall timeline did not match the retrieved wall");
+    private void validateWall(List<Message> wallCommandResultToValidate, List<String> expectedSenders) {
+        final List<Message> s = buildExpectedWallMessages(expectedSenders);
+        assertIterableEquals(s, wallCommandResultToValidate, "The expected wall  did not match the retrieved wall");
     }
 
-    private List<String> buildWallFromExpectedSenders(List<String> expectedSenders) {
+    private List<Message> buildExpectedWallMessages(List<String> expectedSenders) {
         return allPosts.stream()
-                       .map(x -> x.sender)
-                       .filter(expectedSenders::contains)
-                       .collect(Collectors.toList());
-    }
-
-    private List<String> extractSenders(List<Message> messages) {
-        return messages.stream()
-                       .map(x -> x.user)
+                       .filter(x -> expectedSenders.contains(x.sender))
+                       .map(expectedMessageFactory::buildExpectedMessage)
                        .collect(Collectors.toList());
     }
 
