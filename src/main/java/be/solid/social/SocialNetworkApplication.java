@@ -1,38 +1,57 @@
 package be.solid.social;
 
-import be.solid.social.console.Command;
-import be.solid.social.console.CommandParser;
+import be.solid.social.console.ConsoleAdapter;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 public class SocialNetworkApplication {
+    private static final String EXIT = "exit";
+    private final ConsoleAdapter consoleAdapter;
+
+    public SocialNetworkApplication(ConsoleAdapter consoleAdapter) {
+        this.consoleAdapter = consoleAdapter;
+    }
 
     public static void main(String[] args) {
-        System.out.println("Starting SocialNetworkApplication");
-        System.out.println("*************************");
+        final SocialNetworkApplication socialNetworkApplication = new SocialNetworkApplication(new ConsoleAdapter());
+        socialNetworkApplication.run();
+    }
+
+    public void run() {
+        printStartMessage();
+        scanContinuously();
+        printCloseApplication();
+    }
+
+    public void scanContinuously() {
         final Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("");
-            System.out.println("[SNA] Please enter a command");
+            System.out.println("[SNA] Please enter a command - exit to quit");
 
             final String line = scanner.nextLine();
-            if (line.equalsIgnoreCase("exit")) break;
+            if (line.equalsIgnoreCase(EXIT)) break;
 
-            processCommand(line);
+            consoleAdapter.processCommand(line);
 
         }
+    }
+
+
+    private void printCloseApplication() {
         System.out.println("*************************");
         System.out.println("Stopping SocialNetworkApplication");
     }
 
-    private static void processCommand(String line) {
-        final Optional<Command> command = CommandParser.parseCommand(line);
-        System.out.println("[SNA] i read: " + line);
-        command.ifPresent(x -> System.out.println("[SNA] parsed to command: " + x.toString()));
-    }
-
-    private static void launchCommand(Command c) {
-
+    private void printStartMessage() {
+        System.out.println("Starting SocialNetworkApplication");
+        System.out.println("*************************");
+        System.out.println("Commands : ");
+        System.out.println("- posting: <user name> -> <message>");
+        System.out.println("- reading: <user name>");
+        System.out.println("- following: <user name> follows <another user>");
+        System.out.println("- wall: <user name> wall");
+        System.out.println("- exit: quit application");
     }
 }
+
