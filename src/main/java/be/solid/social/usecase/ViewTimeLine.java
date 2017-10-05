@@ -1,6 +1,6 @@
 package be.solid.social.usecase;
 
-public class ViewTimeLine implements Command {
+public class ViewTimeLine implements Command<Event> {
     public final String user;
 
     private ViewTimeLine(Builder builder) {
@@ -8,8 +8,9 @@ public class ViewTimeLine implements Command {
     }
 
     @Override
-    public void execute(SocialNetworkUseCases useCases) {
+    public Event execute(SocialNetworkUseCases useCases) {
         useCases.execute(this);
+        return null;
     }
 
     public static Builder newBuilder() {

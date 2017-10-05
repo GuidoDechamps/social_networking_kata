@@ -1,7 +1,6 @@
 package be.solid.social;
 
 
-import be.solid.social.domain.Message;
 import be.solid.social.domain.ReaderService;
 import be.solid.social.impl.Messages;
 import be.solid.social.impl.PrintMessagesDecorator;
@@ -54,7 +53,7 @@ public class AcceptanceTests {
     void postMessage(final MessageData input) {
         post(input);
 
-        final List<Message> messages = read(input.sender);
+        final List<Event> messages = read(input.sender);
 
         singleMessageValidator.validateSingleMessage(messages, input);
     }
@@ -65,7 +64,7 @@ public class AcceptanceTests {
     void readTimeLineFromSender(final String sender) {
         postAllMessages();
 
-        final List<Message> messages = read(sender);
+        final List<Event> messages = read(sender);
 
         timeLineValidator.validate(sender, messages);
     }
@@ -76,7 +75,7 @@ public class AcceptanceTests {
     void wallWithNoSubscriptions(final String sender) {
         postAllMessages();
 
-        final List<Message> messages = wall(sender);
+        final List<Event> messages = wall(sender);
 
         timeLineValidator.validate(sender, messages);
 
@@ -88,7 +87,7 @@ public class AcceptanceTests {
         postAllMessages();
         follow(CHARLIE, ALICE);
 
-        final List<Message> messages = wall(CHARLIE);
+        final List<Event> messages = wall(CHARLIE);
 
         wallValidator.validate(messages, ALICE, CHARLIE);
 
@@ -100,7 +99,7 @@ public class AcceptanceTests {
         postAllMessages();
         follow(ALICE, BOB);
 
-        final List<Message> messages = wall(ALICE);
+        final List<Event> messages = wall(ALICE);
 
         wallValidator.validate(messages, BOB, ALICE);
 
@@ -113,7 +112,7 @@ public class AcceptanceTests {
         follow(BOB, CHARLIE);
         follow(BOB, ALICE);
 
-        final List<Message> messages = wall(BOB);
+        final List<Event> messages = wall(BOB);
 
         wallValidator.validate(messages, CHARLIE, BOB, ALICE);
 
@@ -139,14 +138,14 @@ public class AcceptanceTests {
         useCases.execute(following);
     }
 
-    private List<Message> read(String sender) {
+    private List<Event> read(String sender) {
         final ViewTimeLine viewTimeLine = ViewTimeLine.newBuilder()
                                                       .withUser(sender)
                                                       .build();
         return useCases.execute(viewTimeLine);
     }
 
-    private List<Message> wall(String sender) {
+    private List<Event> wall(String sender) {
         return useCases.execute(ViewWall.newBuilder()
                                         .withUser(sender)
                                         .build());

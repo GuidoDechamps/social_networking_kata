@@ -1,6 +1,6 @@
 package be.solid.social.usecase;
 
-public interface Command {
+public interface Command<T> {
 
-    void execute(SocialNetworkUseCases useCases);
+    T execute(SocialNetworkUseCases useCases);
 }

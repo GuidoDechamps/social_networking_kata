@@ -1,6 +1,6 @@
 package be.solid.social.usecase;
 
-public class Following implements Command {
+public class Following implements Command<Void> {
     public final String user;
     public final String subscriptionTopic;
 
@@ -14,8 +14,9 @@ public class Following implements Command {
     }
 
     @Override
-    public void execute(SocialNetworkUseCases useCases) {
+    public Void execute(SocialNetworkUseCases useCases) {
         useCases.execute(this);
+        return null;
     }
 
     public static final class Builder {

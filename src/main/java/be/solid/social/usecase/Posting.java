@@ -1,6 +1,6 @@
 package be.solid.social.usecase;
 
-public class Posting implements Command {
+public class Posting implements Command<Void> {
     public final String content;
     public final String actor;
 
@@ -14,8 +14,9 @@ public class Posting implements Command {
     }
 
     @Override
-    public void execute(SocialNetworkUseCases useCases) {
+    public Void execute(SocialNetworkUseCases useCases) {
         useCases.execute(this);
+        return null;
     }
 
     public static final class Builder {

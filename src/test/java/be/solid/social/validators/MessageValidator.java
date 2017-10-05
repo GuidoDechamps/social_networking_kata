@@ -2,6 +2,7 @@ package be.solid.social.validators;
 
 import be.solid.social.MessageData;
 import be.solid.social.domain.Message;
+import be.solid.social.usecase.Event;
 
 import java.util.List;
 
@@ -14,19 +15,21 @@ public class MessageValidator {
         this.expectedMessageFactory = expectedMessageFactory;
     }
 
-    public void validate(MessageData originalMessageData, Message message) {
+    public void validate(MessageData originalMessageData, Event event) {
         final Message expectedMessage = expectedMessageFactory.buildExpectedMessage(originalMessageData);
-        assertEquals(expectedMessage, message);
+        assertEquals(expectedMessage.user, event.user);
+        assertEquals(expectedMessage.content, event.content);
+        assertEquals(expectedMessage.user, event.user);
     }
 
-    public void validateSingleMessage(List<Message> allReadMessages, MessageData originalInputData) {
+    public void validateSingleMessage(List<Event> allReadMessages, MessageData originalInputData) {
         checkSingleMessage(allReadMessages);
-        final Message message = allReadMessages.get(0);
+        final Event message = allReadMessages.get(0);
         validate(originalInputData, message);
 
     }
 
-    private void checkSingleMessage(List<Message> allReadMessages) {
+    private void checkSingleMessage(List<Event> allReadMessages) {
         assertFalse(allReadMessages.isEmpty(), "No messages were present");
         assertTrue(allReadMessages.size() == 1, "Only one message was expected. Found " + allReadMessages);
     }

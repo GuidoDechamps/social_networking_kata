@@ -1,6 +1,8 @@
 package be.solid.social.usecase;
 
-public class ViewWall implements Command {
+import java.util.List;
+
+public class ViewWall implements Command<List<Event>> {
     public final String user;
 
     private ViewWall(Builder builder) {
@@ -8,8 +10,10 @@ public class ViewWall implements Command {
     }
 
     @Override
-    public void execute(SocialNetworkUseCases useCases) {
+    public List<Event> execute(SocialNetworkUseCases useCases) {
         useCases.execute(this);
+        return null;
+
     }
 
     public static Builder newBuilder() {

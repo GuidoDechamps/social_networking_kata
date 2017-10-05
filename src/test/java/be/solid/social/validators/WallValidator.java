@@ -2,6 +2,7 @@ package be.solid.social.validators;
 
 import be.solid.social.MessageData;
 import be.solid.social.domain.Message;
+import be.solid.social.usecase.Event;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,11 +19,11 @@ public class WallValidator {
         this.allPosts = allPosts;
     }
 
-    public void validate(List<Message> messages, String... expectedSenders) {
+    public void validate(List<Event> messages, String... expectedSenders) {
         validateWall(messages, newArrayList(expectedSenders));
     }
 
-    private void validateWall(List<Message> wallCommandResultToValidate, List<String> expectedSenders) {
+    private void validateWall(List<Event> wallCommandResultToValidate, List<String> expectedSenders) {
         final List<Message> s = buildExpectedWallMessages(expectedSenders);
         assertIterableEquals(s, wallCommandResultToValidate, "The expected wall  did not match the retrieved wall");
     }
