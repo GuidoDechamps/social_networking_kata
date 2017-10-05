@@ -1,6 +1,7 @@
 package be.solid.social.console;
 
 import be.solid.social.usecase.Command;
+import be.solid.social.usecase.SocialNetworkUseCases;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -11,10 +12,12 @@ import static be.solid.social.console.CommandTokens.EXIT;
 
 public class ConsoleAdapter {
 
+    private final SocialNetworkUseCases socialNetworkUseCases;
     private final InputStream inputStream;
     private final PrintStream outputStream;
 
-    public ConsoleAdapter(InputStream inputStream, PrintStream outputStream) {
+    public ConsoleAdapter(SocialNetworkUseCases socialNetworkUseCases, InputStream inputStream, PrintStream outputStream) {
+        this.socialNetworkUseCases = socialNetworkUseCases;
         this.inputStream = inputStream;
         this.outputStream = outputStream;
     }
@@ -45,10 +48,9 @@ public class ConsoleAdapter {
     private void processCommand(String line) {
         outputStream.println("[i read: " + line + "]");
         final Optional<Command> command = CommandParser.parseCommand(line);
-        command.ifPresent(x -> outputStream.println("[parsed to command: " + x.toString() + "]"));
+        command.ifPresent(x -> x.execute(socialNetworkUseCases));
+        outputStream.println("[executed: " + line + "]");
     }
 
-    private void launchCommand(Command c) {
-        //TODO
-    }
+
 }

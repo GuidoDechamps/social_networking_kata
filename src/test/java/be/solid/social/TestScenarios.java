@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static be.solid.social.console.CommandTokens.*;
-import static java.time.zone.ZoneOffsetTransitionRule.TimeDefinition.WALL;
 
 public class TestScenarios {
     static final String ALICE = "Alice";
@@ -21,6 +20,16 @@ public class TestScenarios {
     private TestScenarios() {
     }
 
+    public static List<String> allCommandLines() {
+        return ImmutableList.<String>builder()
+                .addAll(users())
+                .addAll(commandLineFollows())
+                .addAll(commandLinePosts())
+                .addAll(commandLineFollows())
+                .addAll(users())
+                .addAll(commandLineWall())
+                .build();
+    }
     public static List<String> commandLinePosts() {
         return sequenceOfPosts().stream()
                                 .map(x -> (x.sender + SPACE + ARROW + SPACE + x.message))
@@ -48,6 +57,12 @@ public class TestScenarios {
     }
 
     public static List<String> commandLineWall() {
+        return users().stream()
+                      .map(x -> (x + SPACE + WALL))
+                      .collect(Collectors.toList());
+    }
+
+    public static List<String> commandLineViewWall() {
         return users().stream()
                       .map(x -> (x + SPACE + WALL))
                       .collect(Collectors.toList());

@@ -1,6 +1,5 @@
-package be.solid.social;
+package be.solid.social.main;
 
-import be.solid.social.console.ConsoleAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,8 +8,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.time.Clock;
 
-import static be.solid.social.TestScenarios.commandLinePosts;
+import static be.solid.social.TestScenarios.allCommandLines;
 import static be.solid.social.TestScenarios.withExitCommand;
 import static java.util.stream.Collectors.joining;
 
@@ -19,16 +19,13 @@ import static java.util.stream.Collectors.joining;
 class SocialNetworkingIT {
 
     private static final String LINE_SEPARATOR = "\r\n";
-    private SocialNetworkApplication application;
+    private SocialNetwork application;
     private ByteArrayOutputStream byteArrayOutputStream;
 
     @BeforeEach
     void setUp() {
         byteArrayOutputStream = new ByteArrayOutputStream();
-        PrintStream outputStream = new PrintStream(byteArrayOutputStream);
-
-        final String input = buildConsoleInput();
-        buildApplication(outputStream, input);
+        application = buildApplication();
     }
 
     @Test()
@@ -40,13 +37,16 @@ class SocialNetworkingIT {
         System.out.println(printedMessages);
     }
 
+    private SocialNetwork buildApplication() {
+        final PrintStream outputStream = new PrintStream(byteArrayOutputStream);
+        final String input = buildConsoleInput();
+        final InputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        return SocialNetworkFactory.create(Clock.systemUTC(), inputStream, outputStream);
+    }
+
     private String buildConsoleInput() {
-        return withExitCommand(commandLinePosts()).stream()
+        return withExitCommand(allCommandLines()).stream()
                                                   .collect(joining(LINE_SEPARATOR));
     }
 
-    private void buildApplication(PrintStream outputStream, String input) {
-        InputStream inputStream = new ByteArrayInputStream(input.getBytes());
-        application = new SocialNetworkApplication(outputStream, new ConsoleAdapter(inputStream, outputStream));
-    }
 }
