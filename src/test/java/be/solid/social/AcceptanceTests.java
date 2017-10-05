@@ -2,10 +2,10 @@ package be.solid.social;
 
 
 import be.solid.social.domain.Message;
-import be.solid.social.domain.PublishingService;
 import be.solid.social.domain.ReaderService;
 import be.solid.social.impl.Messages;
 import be.solid.social.impl.PrintMessagesDecorator;
+import be.solid.social.usecase.*;
 import be.solid.social.validators.MessageValidator;
 import be.solid.social.validators.TimeLineValidator;
 import be.solid.social.validators.ValidatorFactory;
@@ -25,8 +25,7 @@ import static be.solid.social.TestScenarios.*;
 @DisplayName("Social Kata Acceptance tests")
 public class AcceptanceTests {
 
-    private final PublishingService publishingService;
-    private final ReaderService readerService;
+    private final SocialNetworkUseCases useCases;
     private final WallValidator wallValidator;
     private final MessageValidator singleMessageValidator;
     private final TimeLineValidator timeLineValidator;
@@ -34,9 +33,9 @@ public class AcceptanceTests {
 
 
     public AcceptanceTests(Messages messages, SecondIncrementClock clock) {
-        this.publishingService = messages;
-        this.readerService = PrintMessagesDecorator.decorate(messages, clock);
+        final ReaderService readerService = PrintMessagesDecorator.decorate(messages, clock);
         this.clock = clock;
+        this.useCases = new SocialNetworkUseCases(messages, readerService);
 
         final ValidatorFactory validatorFactory = new ValidatorFactory(clock);
         this.singleMessageValidator = validatorFactory.createSingleMessageValidator();
@@ -53,9 +52,9 @@ public class AcceptanceTests {
     @DisplayName("Post single message")
     @MethodSource("individualPosts")
     void postMessage(final MessageData input) {
-        publishingService.post(input.sender, input.message);
+        post(input);
 
-        final List<Message> messages = readerService.read(input.sender);
+        final List<Message> messages = read(input.sender);
 
         singleMessageValidator.validateSingleMessage(messages, input);
     }
@@ -66,7 +65,7 @@ public class AcceptanceTests {
     void readTimeLineFromSender(final String sender) {
         postAllMessages();
 
-        final List<Message> messages = readerService.read(sender);
+        final List<Message> messages = read(sender);
 
         timeLineValidator.validate(sender, messages);
     }
@@ -77,7 +76,7 @@ public class AcceptanceTests {
     void wallWithNoSubscriptions(final String sender) {
         postAllMessages();
 
-        final List<Message> messages = readerService.readWall(sender);
+        final List<Message> messages = wall(sender);
 
         timeLineValidator.validate(sender, messages);
 
@@ -87,9 +86,9 @@ public class AcceptanceTests {
     @DisplayName("Wall with subscriptions for Charlie")
     void wallCharlieWithSubscriptions() {
         postAllMessages();
-        publishingService.subscribe(CHARLIE, ALICE);
+        follow(CHARLIE, ALICE);
 
-        final List<Message> messages = readerService.readWall(CHARLIE);
+        final List<Message> messages = wall(CHARLIE);
 
         wallValidator.validate(messages, ALICE, CHARLIE);
 
@@ -99,9 +98,9 @@ public class AcceptanceTests {
     @DisplayName("Wall with subscriptions for Alice")
     void wallAliceWithSubscriptions() {
         postAllMessages();
-        publishingService.subscribe(ALICE, BOB);
+        follow(ALICE, BOB);
 
-        final List<Message> messages = readerService.readWall(ALICE);
+        final List<Message> messages = wall(ALICE);
 
         wallValidator.validate(messages, BOB, ALICE);
 
@@ -111,10 +110,10 @@ public class AcceptanceTests {
     @DisplayName("Wall with subscriptions for Bob")
     void wallBobWithSubscriptions() {
         postAllMessages();
-        publishingService.subscribe(BOB, CHARLIE);
-        publishingService.subscribe(BOB, ALICE);
+        follow(BOB, CHARLIE);
+        follow(BOB, ALICE);
 
-        final List<Message> messages = readerService.readWall(BOB);
+        final List<Message> messages = wall(BOB);
 
         wallValidator.validate(messages, CHARLIE, BOB, ALICE);
 
@@ -132,9 +131,40 @@ public class AcceptanceTests {
         return TestScenarios.users();
     }
 
+    private void follow(String user, String target) {
+        final Following following = Following.newBuilder()
+                                             .withUser(user)
+                                             .withSubscriptionTopic(target)
+                                             .build();
+        useCases.execute(following);
+    }
+
+    private List<Message> read(String sender) {
+        final ViewTimeLine viewTimeLine = ViewTimeLine.newBuilder()
+                                                      .withUser(sender)
+                                                      .build();
+        return useCases.execute(viewTimeLine);
+    }
+
+    private List<Message> wall(String sender) {
+        return useCases.execute(ViewWall.newBuilder()
+                                        .withUser(sender)
+                                        .build());
+    }
+
+    private void post(MessageData input) {
+        useCases.execute(createPostCommand(input));
+    }
+
+    private Posting createPostCommand(MessageData input) {
+        return Posting.newBuilder()
+                      .withActor(input.sender)
+                      .withContent(input.message)
+                      .build();
+    }
 
     private void postAllMessages() {
-        allPostsToBeMade().forEach(input -> publishingService.post(input.sender, input.message));
+        allPostsToBeMade().forEach(this::createPostCommand);
     }
 
 
