@@ -1,6 +1,7 @@
 package be.solid.social.console;
 
 import be.solid.social.TestScenarios;
+import be.solid.social.usecase.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,9 +33,9 @@ class CommandParserTest {
     void followParsing(String inputLine) {
         final Command command = parseToCommand(inputLine);
 
-        final Following posting = convertToCommandType(command, inputLine, Following.class);
-        assertTrue(inputLine.startsWith(posting.user), "Invalid user " + posting.user);
-        assertTrue(inputLine.endsWith(posting.subscriptionTopic), "Invalid user subscription :" + posting.subscriptionTopic);
+        final Following following = convertToCommandType(command, inputLine, Following.class);
+        assertTrue(inputLine.startsWith(following.user), "Invalid user " + following.user);
+        assertTrue(inputLine.endsWith(following.subscriptionTopic), "Invalid user subscription :" + following.subscriptionTopic);
 
     }
 

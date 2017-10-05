@@ -1,5 +1,7 @@
 package be.solid.social.console;
 
+import be.solid.social.usecase.*;
+
 import java.util.Optional;
 
 import static be.solid.social.console.CommandTokens.*;

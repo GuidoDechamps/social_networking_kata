@@ -1,8 +1,8 @@
-package be.solid.social.console;
+package be.solid.social.usecase;
 
-class Posting implements Command{
-     final String content;
-     final String actor;
+public class Posting implements Command {
+    public final String content;
+    public final String actor;
 
     private Posting(Builder builder) {
         content = builder.content;
@@ -11,6 +11,11 @@ class Posting implements Command{
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    @Override
+    public void execute(SocialNetworkUseCases useCases) {
+        useCases.execute(this);
     }
 
     public static final class Builder {

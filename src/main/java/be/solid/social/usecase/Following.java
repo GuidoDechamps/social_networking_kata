@@ -1,8 +1,8 @@
-package be.solid.social.console;
+package be.solid.social.usecase;
 
-class Following implements Command {
-    final String user;
-    final String subscriptionTopic;
+public class Following implements Command {
+    public final String user;
+    public final String subscriptionTopic;
 
     private Following(Builder builder) {
         user = builder.user;
@@ -11,6 +11,11 @@ class Following implements Command {
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    @Override
+    public void execute(SocialNetworkUseCases useCases) {
+        useCases.execute(this);
     }
 
     public static final class Builder {

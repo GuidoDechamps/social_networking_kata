@@ -1,10 +1,15 @@
-package be.solid.social.console;
+package be.solid.social.usecase;
 
-class ViewTimeLine implements Command {
-    final String user;
+public class ViewWall implements Command {
+    public final String user;
 
-    private ViewTimeLine(Builder builder) {
+    private ViewWall(Builder builder) {
         user = builder.user;
+    }
+
+    @Override
+    public void execute(SocialNetworkUseCases useCases) {
+        useCases.execute(this);
     }
 
     public static Builder newBuilder() {
@@ -22,8 +27,8 @@ class ViewTimeLine implements Command {
             return this;
         }
 
-        public ViewTimeLine build() {
-            return new ViewTimeLine(this);
+        public ViewWall build() {
+            return new ViewWall(this);
         }
     }
 }

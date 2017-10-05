@@ -1,5 +1,7 @@
 package be.solid.social.console;
 
+import be.solid.social.usecase.Command;
+
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Optional;
@@ -47,6 +49,6 @@ public class ConsoleAdapter {
     }
 
     private void launchCommand(Command c) {
-
+        //TODO
     }
 }
