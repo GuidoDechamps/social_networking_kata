@@ -131,28 +131,42 @@ public class AcceptanceTests {
     }
 
     private void follow(String user, String target) {
-        final Following following = Following.newBuilder()
-                                             .withUser(user)
-                                             .withSubscriptionTopic(target)
-                                             .build();
+        final Following following = createFollowingCommand(user, target);
         useCases.execute(following);
     }
 
+    private Following createFollowingCommand(String user, String target) {
+        return Following.newBuilder()
+                        .withUser(user)
+                        .withSubscriptionTopic(target)
+                        .build();
+    }
+
     private List<Event> read(String sender) {
-        final ViewTimeLine viewTimeLine = ViewTimeLine.newBuilder()
-                                                      .withUser(sender)
-                                                      .build();
+        final ViewTimeLine viewTimeLine = createViewTimeLineCommand(sender);
         return useCases.execute(viewTimeLine);
     }
 
+    private ViewTimeLine createViewTimeLineCommand(String sender) {
+        return ViewTimeLine.newBuilder()
+                           .withUser(sender)
+                           .build();
+    }
+
     private List<Event> wall(String sender) {
-        return useCases.execute(ViewWall.newBuilder()
-                                        .withUser(sender)
-                                        .build());
+        final ViewWall viewWallCommand = createViewWallCommand(sender);
+        return useCases.execute(viewWallCommand);
+    }
+
+    private ViewWall createViewWallCommand(String sender) {
+        return ViewWall.newBuilder()
+                       .withUser(sender)
+                       .build();
     }
 
     private void post(MessageData input) {
-        useCases.execute(createPostCommand(input));
+        final Posting postCommand = createPostCommand(input);
+        useCases.execute(postCommand);
     }
 
     private Posting createPostCommand(MessageData input) {
@@ -163,7 +177,7 @@ public class AcceptanceTests {
     }
 
     private void postAllMessages() {
-        allPostsToBeMade().forEach(this::createPostCommand);
+        allPostsToBeMade().forEach(this::post);
     }
 
 

@@ -1,6 +1,7 @@
 package be.solid.social.usecase;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class Event {
     public final String user;
@@ -11,6 +12,19 @@ public class Event {
         user = builder.user;
         content = builder.content;
         time = builder.time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Objects.equals(user, event.user) && Objects.equals(content, event.content) && Objects.equals(time, event.time);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, content, time);
     }
 
     public static Builder newBuilder() {

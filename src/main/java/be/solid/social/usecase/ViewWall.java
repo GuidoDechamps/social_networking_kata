@@ -9,15 +9,14 @@ public class ViewWall implements Command<List<Event>> {
         user = builder.user;
     }
 
-    @Override
-    public List<Event> execute(SocialNetworkUseCases useCases) {
-        useCases.execute(this);
-        return null;
-
-    }
-
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    @Override
+    public List<Event> execute(SocialNetworkUseCases useCases) {
+        return useCases.execute(this);
+
     }
 
     public static final class Builder {

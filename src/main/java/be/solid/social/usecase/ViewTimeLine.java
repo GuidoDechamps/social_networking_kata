@@ -1,20 +1,21 @@
 package be.solid.social.usecase;
 
-public class ViewTimeLine implements Command<Event> {
+import java.util.List;
+
+public class ViewTimeLine implements Command<List<Event>> {
     public final String user;
 
     private ViewTimeLine(Builder builder) {
         user = builder.user;
     }
 
-    @Override
-    public Event execute(SocialNetworkUseCases useCases) {
-        useCases.execute(this);
-        return null;
-    }
-
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    @Override
+    public List<Event> execute(SocialNetworkUseCases useCases) {
+        return useCases.execute(this);
     }
 
     public static final class Builder {

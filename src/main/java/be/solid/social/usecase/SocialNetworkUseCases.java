@@ -6,7 +6,7 @@ import be.solid.social.domain.ReaderService;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
+import static be.solid.social.usecase.EventMapper.map;
 
 public class SocialNetworkUseCases {
 
@@ -36,17 +36,4 @@ public class SocialNetworkUseCases {
         return map(messages);
     }
 
-    private List<Event> map(List<Message> messages) {
-        return messages.stream()
-                       .map(this::mapToEvent)
-                       .collect(toList());
-    }
-
-    private Event mapToEvent(Message x) {
-        return Event.newBuilder()
-                    .withUser(x.user)
-                    .withContent(x.content)
-                    .withTime(x.time)
-                    .build();
-    }
 }

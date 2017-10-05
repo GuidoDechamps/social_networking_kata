@@ -1,7 +1,6 @@
 package be.solid.social.validators;
 
 import be.solid.social.MessageData;
-import be.solid.social.domain.Message;
 import be.solid.social.usecase.Event;
 
 import java.util.List;
@@ -21,15 +20,15 @@ public class TimeLineValidator {
 
 
    public void validate(String subjectOfWallCommand, List<Event> resultFromWallCommand) {
-        final List<Message> expectedTimeLine = buildExpectedMessages(subjectOfWallCommand);
+        final List<Event> expectedTimeLine = buildExpectedMessages(subjectOfWallCommand);
         assertIterableEquals(expectedTimeLine, resultFromWallCommand, "The expected user time line did not match the retrieved timeline");
     }
 
 
-    private List<Message> buildExpectedMessages(String subjectOfWallCommand) {
+    private List<Event> buildExpectedMessages(String subjectOfWallCommand) {
         return allPosts.stream()
                        .filter(x -> x.sender.equals(subjectOfWallCommand))
-                       .map(expectedMessageFactory::buildExpectedMessage)
+                       .map(expectedMessageFactory::buildExpectedEvent)
                        .collect(Collectors.toList());
     }
 }
