@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static be.solid.social.console.CommandParser.*;
+import static be.solid.social.console.CommandTokens.*;
 import static java.time.zone.ZoneOffsetTransitionRule.TimeDefinition.WALL;
 
 public class TestScenarios {
@@ -39,6 +39,12 @@ public class TestScenarios {
 
     public static List<String> users() {
         return ImmutableList.of(ALICE, BOB, CHARLIE);
+    }
+
+    public static List<String> withExitCommand(List<String> commands) {
+        return ImmutableList.<String>builder().addAll(commands)
+                                              .add(EXIT)
+                                              .build();
     }
 
     public static List<String> commandLineWall() {

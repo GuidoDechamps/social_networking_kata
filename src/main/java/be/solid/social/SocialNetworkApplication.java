@@ -2,39 +2,26 @@ package be.solid.social;
 
 import be.solid.social.console.ConsoleAdapter;
 
-import java.util.Scanner;
+import java.io.PrintStream;
 
 public class SocialNetworkApplication {
-    private static final String EXIT = "exit";
+    private final PrintStream outputStream;
     private final ConsoleAdapter consoleAdapter;
 
-    public SocialNetworkApplication(ConsoleAdapter consoleAdapter) {
+    public SocialNetworkApplication(PrintStream outputStream, ConsoleAdapter consoleAdapter) {
+        this.outputStream = outputStream;
         this.consoleAdapter = consoleAdapter;
     }
 
     public static void main(String[] args) {
-        final SocialNetworkApplication socialNetworkApplication = new SocialNetworkApplication(new ConsoleAdapter());
+        final SocialNetworkApplication socialNetworkApplication = new SocialNetworkApplication(System.out, new ConsoleAdapter(System.in, System.out));
         socialNetworkApplication.run();
     }
 
     public void run() {
         printStartMessage();
-        scanContinuously();
+        consoleAdapter.scanContinuously();
         printCloseApplication();
-    }
-
-    public void scanContinuously() {
-        final Scanner scanner = new Scanner(System.in);
-        while (true) {
-            System.out.println("");
-            System.out.println("[SNA] Please enter a command - exit to quit");
-
-            final String line = scanner.nextLine();
-            if (line.equalsIgnoreCase(EXIT)) break;
-
-            consoleAdapter.processCommand(line);
-
-        }
     }
 
 
@@ -43,6 +30,7 @@ public class SocialNetworkApplication {
         System.out.println("Stopping SocialNetworkApplication");
     }
 
+    //TODO shoudl this be here? Or in adapter
     private void printStartMessage() {
         System.out.println("Starting SocialNetworkApplication");
         System.out.println("*************************");

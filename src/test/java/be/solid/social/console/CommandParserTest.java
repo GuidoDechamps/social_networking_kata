@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static be.solid.social.console.CommandParser.ARROW;
+import static be.solid.social.console.CommandTokens.ARROW;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Console Command Parser Test")

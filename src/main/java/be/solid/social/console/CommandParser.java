@@ -2,6 +2,7 @@ package be.solid.social.console;
 
 import java.util.Optional;
 
+import static be.solid.social.console.CommandTokens.*;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -13,10 +14,7 @@ import static java.util.Optional.of;
  * - Command wall: \<user name> wall
  */
 public class CommandParser {
-    public static final String ARROW = "->";
-    public static final String SPACE = " ";
-    public static final String FOLLOWS = "follow";
-    public static final String WALL = "wall";
+
 
     public static Optional<Command> parseCommand(String line) {
         if (isInvalidInput(line)) return empty();
