@@ -34,7 +34,7 @@ class SocialNetworkingIT {
     @DisplayName("Run basic scenarios")
     void justRun() {
         application.run();
-        System.out.println("=========================");
+        System.out.println(byteArrayOutputStream);
         final List<String> commandResults = extractCommandResults(byteArrayOutputStream.toString());
         assertFalse(commandResults.isEmpty());
     }

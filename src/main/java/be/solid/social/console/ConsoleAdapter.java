@@ -1,10 +1,12 @@
 package be.solid.social.console;
 
 import be.solid.social.usecase.Command;
+import be.solid.social.usecase.Event;
 import be.solid.social.usecase.SocialNetworkUseCases;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -23,6 +25,7 @@ public class ConsoleAdapter {
     }
 
     public void scanContinuously() {
+        printStartMessage();
         final Scanner scanner = new Scanner(inputStream);
         while (true) {
             printRequestForCommand();
@@ -46,10 +49,38 @@ public class ConsoleAdapter {
 
 
     private void processCommand(String line) {
-        outputStream.println("[i read: " + line + "]");
+        outputStream.println("[" + line + "]");
         final Optional<Command> command = CommandParser.parseCommand(line);
-        command.ifPresent(x -> x.execute(socialNetworkUseCases));
-        outputStream.println("[executed: " + line + "]");
+        command.ifPresent(this::executeCommand);
+    }
+
+    private void executeCommand(Command command) {
+        final Object result = command.execute(socialNetworkUseCases);
+        //TODO write elsewhere
+        printResult(result);
+
+    }
+
+    private void printResult(Object result) {
+        if (result == null) {
+            outputStream.println("[executed command ");
+        } else if (Event.class.isInstance(result)) {
+            final Event event = Event.class.cast(result);
+            outputStream.println(event.user);
+        } else if (List.class.isInstance(result)) {
+            final List events = List.class.cast(result);
+            events.forEach(this::printResult);
+        } else throw new RuntimeException("Unknown result type " + result.getClass()
+                                                                         .getSimpleName());
+    }
+
+    private void printStartMessage() {
+        outputStream.println("Commands : ");
+        outputStream.println("- posting: <user name> -> <message>");
+        outputStream.println("- reading: <user name>");
+        outputStream.println("- following: <user name> follows <another user>");
+        outputStream.println("- wall: <user name> wall");
+        outputStream.println("- exit: quit application");
     }
 
 
