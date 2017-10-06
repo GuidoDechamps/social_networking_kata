@@ -8,11 +8,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.time.Clock;
+import java.util.List;
 
 import static be.solid.social.TestScenarios.allCommandLines;
 import static be.solid.social.TestScenarios.withExitCommand;
+import static java.time.Clock.systemUTC;
 import static java.util.stream.Collectors.joining;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 @DisplayName("Integration test for the social networking application")
@@ -33,20 +35,26 @@ class SocialNetworkingIT {
     void justRun() {
         application.run();
         System.out.println("=========================");
-        final String printedMessages = byteArrayOutputStream.toString();
-        System.out.println(printedMessages);
+        final List<String> commandResults = extractCommandResults(byteArrayOutputStream.toString());
+        assertFalse(commandResults.isEmpty());
+    }
+
+    private List<String> extractCommandResults(String printedMessages) {
+        final String withoutApplicationMessages = printedMessages.replaceAll("\\[.*\\]", "");
+
+        return List.of(withoutApplicationMessages.split("\\n"));
     }
 
     private SocialNetwork buildApplication() {
         final PrintStream outputStream = new PrintStream(byteArrayOutputStream);
         final String input = buildConsoleInput();
         final InputStream inputStream = new ByteArrayInputStream(input.getBytes());
-        return SocialNetworkFactory.create(Clock.systemUTC(), inputStream, outputStream);
+        return SocialNetworkFactory.create(systemUTC(), inputStream, outputStream);
     }
 
     private String buildConsoleInput() {
         return withExitCommand(allCommandLines()).stream()
-                                                  .collect(joining(LINE_SEPARATOR));
+                                                 .collect(joining(LINE_SEPARATOR));
     }
 
 }
