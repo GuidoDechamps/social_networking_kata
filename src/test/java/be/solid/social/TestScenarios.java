@@ -22,10 +22,8 @@ public class TestScenarios {
 
     public static List<String> allCommandLines() {
         return ImmutableList.<String>builder()
-                .addAll(users())
                 .addAll(commandLineFollows())
                 .addAll(commandLinePosts())
-                .addAll(commandLineFollows())
                 .addAll(users())
                 .addAll(commandLineWall())
                 .build();

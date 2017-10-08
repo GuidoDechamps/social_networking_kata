@@ -12,29 +12,51 @@ import java.util.Scanner;
 
 import static be.solid.social.console.CommandTokens.EXIT;
 
+//TODO refactor class. to many responsibilities
 public class ConsoleAdapter {
 
     private final SocialNetworkUseCases socialNetworkUseCases;
-    private final InputStream inputStream;
     private final PrintStream outputStream;
+    private final InputStream inputStream;
+    private SCAN_STATE state;
+
 
     public ConsoleAdapter(SocialNetworkUseCases socialNetworkUseCases, InputStream inputStream, PrintStream outputStream) {
         this.socialNetworkUseCases = socialNetworkUseCases;
-        this.inputStream = inputStream;
         this.outputStream = outputStream;
+        this.inputStream = inputStream;
+
     }
 
     public void scanContinuously() {
         printStartMessage();
+        state = SCAN_STATE.CONTINUE_SCANNING;
         final Scanner scanner = new Scanner(inputStream);
-        while (true) {
+        do {
             printRequestForCommand();
+            if (scanner.hasNextLine()) processInputLine(scanner.nextLine());
+            else handleNoInputGiven();
+        } while (state.isContinueScanning());
 
-            final String line = scanner.nextLine();
-            if (isExitCommand(line)) break;
-            else processCommand(line);
+    }
 
-        }
+
+    private void handleNoInputGiven() {
+        printNoInputReceived();
+    }
+
+    private void processInputLine(String line) {
+        System.out.println("Line to process : " + line);
+        if (isExitCommand(line)) stopScanning();
+        else processCommand(line);
+    }
+
+    private void stopScanning() {
+        state = SCAN_STATE.EXIT;
+    }
+
+    private void printNoInputReceived() {
+        outputStream.println("[No input given]");
     }
 
     private boolean isExitCommand(String line) {
@@ -51,7 +73,7 @@ public class ConsoleAdapter {
     private void processCommand(String line) {
         outputStream.println("[" + line + "]");
         final Optional<Command> command = CommandParser.parseCommand(line);
-        command.ifPresent(this::executeCommand);
+        command.ifPresentOrElse(this::executeCommand, () -> outputStream.println("[Unknown command {" + line + "}]"));
     }
 
     private void executeCommand(Command command) {
@@ -63,7 +85,7 @@ public class ConsoleAdapter {
 
     private void printResult(Object result) {
         if (result == null) {
-            outputStream.println("[executed command ");
+            outputStream.println("[executed command]");
         } else if (Event.class.isInstance(result)) {
             final Event event = Event.class.cast(result);
             outputStream.println(event.user);
@@ -75,13 +97,20 @@ public class ConsoleAdapter {
     }
 
     private void printStartMessage() {
-        outputStream.println("Commands : ");
-        outputStream.println("- posting: <user name> -> <message>");
-        outputStream.println("- reading: <user name>");
-        outputStream.println("- following: <user name> follows <another user>");
-        outputStream.println("- wall: <user name> wall");
-        outputStream.println("- exit: quit application");
+        outputStream.println("[Commands :                                     ]");
+        outputStream.println("[- posting: <user name> -> <message>            ]");
+        outputStream.println("[- reading: <user name>                         ]");
+        outputStream.println("[- following: <user name> follows <another user>]");
+        outputStream.println("[- wall: <user name> wall                       ]");
+        outputStream.println("[- exit: quit application                       ]");
     }
 
+    enum SCAN_STATE {
+        CONTINUE_SCANNING, EXIT;
 
+        private boolean isContinueScanning() {
+            return this.equals(SCAN_STATE.CONTINUE_SCANNING);
+        }
+
+    }
 }
