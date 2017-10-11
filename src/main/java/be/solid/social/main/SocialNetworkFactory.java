@@ -1,6 +1,7 @@
 package be.solid.social.main;
 
 import be.solid.social.console.ConsoleAdapter;
+import be.solid.social.console.ConsoleMessagePrinter;
 import be.solid.social.impl.Messages;
 import be.solid.social.usecase.SocialNetworkUseCases;
 
@@ -20,7 +21,7 @@ class SocialNetworkFactory {
     static SocialNetwork create(Clock clock, InputStream in, PrintStream outputStream) {
         final Messages messages = new Messages(clock);
         final SocialNetworkUseCases socialNetworkUseCases = new SocialNetworkUseCases(messages, messages);
-        final ConsoleAdapter consoleAdapter = new ConsoleAdapter(socialNetworkUseCases, in, outputStream);
+        final ConsoleAdapter consoleAdapter = new ConsoleAdapter(socialNetworkUseCases, in, new ConsoleMessagePrinter(outputStream));
         return new SocialNetwork(consoleAdapter);
     }
 }
