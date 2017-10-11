@@ -46,7 +46,6 @@ public class ConsoleAdapter {
     }
 
     private void processInputLine(String line) {
-        System.out.println("Line to process : " + line);
         if (isExitCommand(line)) stopScanning();
         else processCommand(line);
     }
@@ -73,7 +72,11 @@ public class ConsoleAdapter {
     private void processCommand(String line) {
         outputStream.println("[" + line + "]");
         final Optional<Command> command = CommandParser.parseCommand(line);
-        command.ifPresentOrElse(this::executeCommand, () -> outputStream.println("[Unknown command {" + line + "}]"));
+        command.ifPresentOrElse(this::executeCommand, printNoCommand(line));
+    }
+
+    private Runnable printNoCommand(String line) {
+        return () -> outputStream.println("[Unknown command {" + line + "}]");
     }
 
     private void executeCommand(Command command) {

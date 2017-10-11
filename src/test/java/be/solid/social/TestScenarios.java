@@ -21,13 +21,13 @@ public class TestScenarios {
     }
 
     public static List<String> allCommandLines() {
-        return ImmutableList.<String>builder()
-                .addAll(commandLineFollows())
-                .addAll(commandLinePosts())
-                .addAll(users())
-                .addAll(commandLineWall())
-                .build();
+        return ImmutableList.<String>builder().addAll(commandLineFollows())
+                                              .addAll(commandLinePosts())
+                                              .addAll(users())
+                                              .addAll(commandLineWall())
+                                              .build();
     }
+
     public static List<String> commandLinePosts() {
         return sequenceOfPosts().stream()
                                 .map(x -> (x.sender + SPACE + ARROW + SPACE + x.message))
@@ -56,17 +56,16 @@ public class TestScenarios {
 
     public static List<String> commandLineWall() {
         return users().stream()
-                      .map(x -> (x + SPACE + WALL))
+                      .map(x -> commandWall(x))
                       .collect(Collectors.toList());
     }
 
-    public static List<String> commandLineViewWall() {
-        return users().stream()
-                      .map(x -> (x + SPACE + WALL))
-                      .collect(Collectors.toList());
+    public static String commandWall(String user) {
+        return user + SPACE + WALL;
     }
 
-    static List<MessageData> sequenceOfPosts() {
+
+    public static List<MessageData> sequenceOfPosts() {
         return ImmutableList.<MessageData>builder().add(new MessageData(1, ALICE, I_LOVE_THE_WEATHER_TODAY))
                                                    .add(new MessageData(2, BOB, DAMN_WE_LOST))
                                                    .add(new MessageData(3, BOB, GOOD_GAME_THOUGH))

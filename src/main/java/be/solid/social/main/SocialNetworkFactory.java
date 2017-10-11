@@ -19,6 +19,8 @@ class SocialNetworkFactory {
 
     static SocialNetwork create(Clock clock, InputStream in, PrintStream outputStream) {
         final Messages messages = new Messages(clock);
-        return new SocialNetwork(new ConsoleAdapter(new SocialNetworkUseCases(messages, messages), in, outputStream));
+        final SocialNetworkUseCases socialNetworkUseCases = new SocialNetworkUseCases(messages, messages);
+        final ConsoleAdapter consoleAdapter = new ConsoleAdapter(socialNetworkUseCases, in, outputStream);
+        return new SocialNetwork(consoleAdapter);
     }
 }

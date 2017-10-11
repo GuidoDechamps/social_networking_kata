@@ -33,24 +33,42 @@ class SocialNetworkingIT {
     }
 
     @Test()
-    @DisplayName("Run basic scenarios")
-    void runBasicScenario() {
-        inputStream.stream(buildConsoleInput(commandLineFollows()));
-        application.run();
+    @DisplayName("View user timelines")
+    void runViewUserTimeLines() {
+
+        runApplicationWithCommands(commandLinePosts());
+        sequenceOfPosts().forEach(x -> {
+            runApplicationWithCommand(x.sender);
+            final List<String> commandResults = getCommandResults();
+            assertTrue(commandResults.contains(x.message), "Message " + x.message + " was not found in output [" + commandResults + "]");
+        });
+//TODO
+
+    }
+
+    @Test()
+    @DisplayName("Follow command scenarios")
+    void runFollowCommands() {
+        runApplicationWithCommands(commandLineFollows());
+
         assertTrue(getCommandResults().isEmpty());
+    }
 
-        inputStream.stream(buildConsoleInput(commandLinePosts()));
-        application.run();
-
-        assertTrue(getCommandResults().isEmpty());
-
-        inputStream.stream(buildConsoleInput(commandLineWall()));
-        application.run();
-        System.out.println(byteArrayOutputStream);
+    @Test()
+    @DisplayName("Wall command scenarios")
+    void runWallCommands() {
+        runApplicationWithCommands(commandLinePosts());
+        runApplicationWithCommands(commandLineWall());
 
         assertFalse(getCommandResults().isEmpty());
+    }
 
+    @Test()
+    @DisplayName("Post command scenarios")
+    void runPostsCommands() {
+        runApplicationWithCommands(commandLinePosts());
 
+        assertTrue(getCommandResults().isEmpty());
     }
 
     @Test()
@@ -58,11 +76,18 @@ class SocialNetworkingIT {
     void invalidCommand() {
         inputStream.stream("invalid command given");
         application.run();
-        final List<String> commandResults = extractCommandResults(byteArrayOutputStream.toString());
+        final List<String> commandResults =getCommandResults();
         assertTrue(commandResults.isEmpty());
     }
 
+    private void runApplicationWithCommands(List<String> commands) {
+        inputStream.stream(buildConsoleInput(commands));
+        application.run();
+    }
 
+    private void runApplicationWithCommand(String command) {
+        runApplicationWithCommands(of(command));
+    }
 
     private List<String> getCommandResults() {
         final List<String> commandResults = extractCommandResults(byteArrayOutputStream.toString());
@@ -73,10 +98,9 @@ class SocialNetworkingIT {
     private List<String> extractCommandResults(String printedMessages) {
         final String withoutApplicationMessages = removeApplicationMessages(printedMessages);
 
-        return of(withoutApplicationMessages.split("\\n"))
-                   .stream()
-                   .filter(x -> !x.isEmpty())
-                   .collect(Collectors.toList());
+        return of(withoutApplicationMessages.split("\\n")).stream()
+                                                          .filter(x -> !x.isEmpty())
+                                                          .collect(Collectors.toList());
     }
 
     private String removeApplicationMessages(String printedMessages) {

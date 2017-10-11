@@ -73,6 +73,7 @@ public class AcceptanceTests {
     @DisplayName("Wall with no subscriptions")
     @MethodSource("senders")
     void wallWithNoSubscriptions(final String sender) {
+        //TODO What is all?
         postAllMessages();
 
         final List<Event> messages = wall(sender);
