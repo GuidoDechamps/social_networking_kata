@@ -1,21 +1,21 @@
 package be.solid.social.impl;
 
-import be.solid.social.SecondIncrementClock;
+import be.solid.social.ManualClock;
 import be.solid.social.domain.Message;
 import be.solid.social.domain.ReaderService;
 
 import java.util.List;
 
 public class PrintMessagesDecorator implements ReaderService {
-    private final SecondIncrementClock clock;
+    private final ManualClock clock;
     private final ReaderService readerService;
 
-    private PrintMessagesDecorator(ReaderService readerService, SecondIncrementClock clock) {
+    private PrintMessagesDecorator(ReaderService readerService, ManualClock clock) {
         this.clock = clock;
         this.readerService = readerService;
     }
 
-    public static ReaderService decorate(ReaderService r, SecondIncrementClock clock) {
+    public static ReaderService decorate(ReaderService r, ManualClock clock) {
         return new PrintMessagesDecorator(r, clock);
     }
 

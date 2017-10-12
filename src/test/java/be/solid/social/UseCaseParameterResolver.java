@@ -16,8 +16,8 @@ public class UseCaseParameterResolver implements ParameterResolver {
     private final Map<Class, Supplier<?>> supportedInstances = new HashMap<>();
 
     public UseCaseParameterResolver() {
-        final Clock myClock = new SecondIncrementClock(5);
-        supportedInstances.put(SecondIncrementClock.class, () -> myClock);
+        final Clock myClock = new ManualClock(5);
+        supportedInstances.put(ManualClock.class, () -> myClock);
         supportedInstances.put(Messages.class, () -> new Messages(myClock));
         supportedInstances.put(Messages.class, () -> new Messages(myClock));
     }

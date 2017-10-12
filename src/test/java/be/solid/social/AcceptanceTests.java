@@ -28,10 +28,10 @@ public class AcceptanceTests {
     private final WallValidator wallValidator;
     private final MessageValidator singleMessageValidator;
     private final TimeLineValidator timeLineValidator;
-    private final SecondIncrementClock clock;
+    private final ManualClock clock;
 
 
-    public AcceptanceTests(Messages messages, SecondIncrementClock clock) {
+    public AcceptanceTests(Messages messages, ManualClock clock) {
         final ReaderService readerService = PrintMessagesDecorator.decorate(messages, clock);
         this.clock = clock;
         this.useCases = new SocialNetworkUseCases(messages, readerService);

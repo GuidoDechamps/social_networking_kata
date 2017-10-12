@@ -35,7 +35,7 @@ public class ConsoleMessagePrinter {
             outputStream.println("[executed command]");
         } else if (Event.class.isInstance(result)) {
             final Event event = Event.class.cast(result);
-            outputStream.println(event.user);
+            outputStream.println(event.content);
         } else if (List.class.isInstance(result)) {
             final List events = List.class.cast(result);
             events.forEach(this::printResult);

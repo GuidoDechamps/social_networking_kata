@@ -40,7 +40,7 @@ class SocialNetworkingIT {
         sequenceOfPosts().forEach(x -> {
             runApplicationWithCommand(x.sender);
             final List<String> commandResults = getCommandResults();
-            assertTrue(commandResults.contains(x.message), "Message " + x.message + " was not found in output [" + commandResults + "]");
+            assertTrue(commandResults.contains(x.message), "Message [" + x.message + "] was not found in output [" + commandResults + "]");
         });
 //TODO
 

@@ -12,7 +12,7 @@ public class TestScenarios {
     static final String BOB = "Bob";
     static final String CHARLIE = "Charlie";
     private static final String I_LOVE_THE_WEATHER_TODAY = "I love the weather today";
-    private static final String DAMN_WE_LOST = "Damn! We lost! ";
+    private static final String DAMN_WE_LOST = "Damn! We lost!";
     private static final String GOOD_GAME_THOUGH = "Good game though.";
     private static final String COFFEE_ANYONE = "I'm in New York today! Anyone wants to have a coffee?";
 

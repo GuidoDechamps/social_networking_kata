@@ -15,7 +15,7 @@ public class MessageData {
 
     @Override
     public String toString() {
-        return "MessageData{" + "sender='" + sender + '\'' + ", message='" + message + '\'' + '}';
+        return "'" + sender + "' posted '" + message + '\'';
     }
 
     @Override

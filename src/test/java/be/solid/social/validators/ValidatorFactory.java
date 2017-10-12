@@ -1,7 +1,7 @@
 package be.solid.social.validators;
 
 import be.solid.social.MessageData;
-import be.solid.social.SecondIncrementClock;
+import be.solid.social.ManualClock;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public class ValidatorFactory {
     private final ExpectedMessageFactory expectedMessageFactory;
 
 
-    public ValidatorFactory(SecondIncrementClock clock) {
+    public ValidatorFactory(ManualClock clock) {
         this.expectedMessageFactory = new ExpectedMessageFactory(clock);
     }
 
