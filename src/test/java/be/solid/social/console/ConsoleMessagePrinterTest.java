@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+
 class ConsoleMessagePrinterTest {
     private final ManualClock clock = new ManualClock(10);
     private ByteArrayOutputStream byteArrayOutputStream;
@@ -41,7 +42,8 @@ class ConsoleMessagePrinterTest {
     }
 
     private String getPrintedMessage() {
-        return byteArrayOutputStream.toString().trim();
+        return byteArrayOutputStream.toString()
+                                    .trim();
     }
 
     private Event toEvent(MessageData x) {

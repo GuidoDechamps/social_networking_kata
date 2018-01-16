@@ -21,20 +21,20 @@ public class TestScenarios {
     }
 
     public static List<String> allCommandLines() {
-        return ImmutableList.<String>builder().addAll(commandLineFollows())
-                                              .addAll(commandLinePosts())
-                                              .addAll(users())
-                                              .addAll(commandLineWall())
+        return ImmutableList.<String>builder().addAll(followsGivenFromCommandLine())
+                                              .addAll(postsGivenFromCommandLine())
+                                              .addAll(userList())
+                                              .addAll(wallCommandFromCommandLine())
                                               .build();
     }
 
-    public static List<String> commandLinePosts() {
+    public static List<String> postsGivenFromCommandLine() {
         return sequenceOfPosts().stream()
                                 .map(x -> (x.sender + SPACE + ARROW + SPACE + x.message))
                                 .collect(Collectors.toList());
     }
 
-    public static List<String> commandLineFollows() {
+    public static List<String> followsGivenFromCommandLine() {
         return ImmutableList.<String>builder().add(ALICE + SPACE + FOLLOWS + SPACE + BOB)
                                               .add(ALICE + SPACE + FOLLOWS + SPACE + CHARLIE)
                                               .add(BOB + SPACE + FOLLOWS + SPACE + ALICE)
@@ -44,7 +44,7 @@ public class TestScenarios {
                                               .build();
     }
 
-    public static List<String> users() {
+    public static List<String> userList() {
         return ImmutableList.of(ALICE, BOB, CHARLIE);
     }
 
@@ -54,16 +54,11 @@ public class TestScenarios {
                                               .build();
     }
 
-    public static List<String> commandLineWall() {
-        return users().stream()
-                      .map(x -> commandWall(x))
-                      .collect(Collectors.toList());
+    public static List<String> wallCommandFromCommandLine() {
+        return userList().stream()
+                         .map(TestScenarios::commandWall)
+                         .collect(Collectors.toList());
     }
-
-    public static String commandWall(String user) {
-        return user + SPACE + WALL;
-    }
-
 
     public static List<MessageData> sequenceOfPosts() {
         return ImmutableList.<MessageData>builder().add(new MessageData(1, ALICE, I_LOVE_THE_WEATHER_TODAY))
@@ -79,5 +74,9 @@ public class TestScenarios {
                                                    .add(new MessageData(1, BOB, GOOD_GAME_THOUGH))
                                                    .add(new MessageData(1, CHARLIE, COFFEE_ANYONE))
                                                    .build();
+    }
+
+    private static String commandWall(String user) {
+        return user + SPACE + WALL;
     }
 }

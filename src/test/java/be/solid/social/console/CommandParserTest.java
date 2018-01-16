@@ -28,7 +28,7 @@ class CommandParserTest {
     }
 
     @ParameterizedTest()
-    @DisplayName("Parse command for users following users")
+    @DisplayName("Parse command for userList following userList")
     @MethodSource("commandLineFollows")
     void followParsing(String inputLine) {
         final Command command = parseToCommand(inputLine);
@@ -61,19 +61,19 @@ class CommandParserTest {
     }
 
     private static List<String> commandLinePosts() {
-        return TestScenarios.commandLinePosts();
+        return TestScenarios.postsGivenFromCommandLine();
     }
 
     private static List<String> commandLineFollows() {
-        return TestScenarios.commandLineFollows();
+        return TestScenarios.followsGivenFromCommandLine();
     }
 
     private static List<String> wallCommandForAllUsers() {
-        return TestScenarios.commandLineWall();
+        return TestScenarios.wallCommandFromCommandLine();
     }
 
     private static List<String> allUsers() {
-        return TestScenarios.users();
+        return TestScenarios.userList();
     }
 
     private void validatePostCommand(String inputLine, Posting posting) {

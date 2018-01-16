@@ -62,7 +62,7 @@ public class AcceptanceTests {
     @DisplayName("Read timeline")
     @MethodSource("senders")
     void readTimeLineFromSender(final String sender) {
-        postAllMessages();
+        postAllExampleMessages();
 
         final List<Event> messages = read(sender);
 
@@ -73,8 +73,7 @@ public class AcceptanceTests {
     @DisplayName("Wall with no subscriptions")
     @MethodSource("senders")
     void wallWithNoSubscriptions(final String sender) {
-        //TODO What is all?
-        postAllMessages();
+        postAllExampleMessages();
 
         final List<Event> messages = wall(sender);
 
@@ -85,7 +84,7 @@ public class AcceptanceTests {
     @Test()
     @DisplayName("Wall with subscriptions for Charlie")
     void wallCharlieWithSubscriptions() {
-        postAllMessages();
+        postAllExampleMessages();
         follow(CHARLIE, ALICE);
 
         final List<Event> messages = wall(CHARLIE);
@@ -97,7 +96,7 @@ public class AcceptanceTests {
     @Test()
     @DisplayName("Wall with subscriptions for Alice")
     void wallAliceWithSubscriptions() {
-        postAllMessages();
+        postAllExampleMessages();
         follow(ALICE, BOB);
 
         final List<Event> messages = wall(ALICE);
@@ -109,7 +108,7 @@ public class AcceptanceTests {
     @Test()
     @DisplayName("Wall with subscriptions for Bob")
     void wallBobWithSubscriptions() {
-        postAllMessages();
+        postAllExampleMessages();
         follow(BOB, CHARLIE);
         follow(BOB, ALICE);
 
@@ -128,7 +127,7 @@ public class AcceptanceTests {
     }
 
     private static List<String> senders() {
-        return TestScenarios.users();
+        return TestScenarios.userList();
     }
 
     private void follow(String user, String target) {
@@ -177,7 +176,7 @@ public class AcceptanceTests {
                       .build();
     }
 
-    private void postAllMessages() {
+    private void postAllExampleMessages() {
         allPostsToBeMade().forEach(this::post);
     }
 

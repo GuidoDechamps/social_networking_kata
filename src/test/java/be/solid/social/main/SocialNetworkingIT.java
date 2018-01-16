@@ -1,5 +1,6 @@
 package be.solid.social.main;
 
+import be.solid.social.MessageData;
 import be.solid.social.console.CommandTokens;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,21 +36,18 @@ class SocialNetworkingIT {
     @Test()
     @DisplayName("View user timelines")
     void runViewUserTimeLines() {
-
-        runApplicationWithCommands(commandLinePosts());
+        runApplicationWithCommands(postsGivenFromCommandLine());
         sequenceOfPosts().forEach(x -> {
             runApplicationWithCommand(x.sender);
             final List<String> commandResults = getCommandResults();
-            assertTrue(commandResults.contains(x.message), "Message [" + x.message + "] was not found in output [" + commandResults + "]");
+            validateExpectedMessageInCommandResult(x, commandResults);
         });
-//TODO
-
     }
 
     @Test()
     @DisplayName("Follow command scenarios")
     void runFollowCommands() {
-        runApplicationWithCommands(commandLineFollows());
+        runApplicationWithCommands(followsGivenFromCommandLine());
 
         assertTrue(getCommandResults().isEmpty());
     }
@@ -57,8 +55,8 @@ class SocialNetworkingIT {
     @Test()
     @DisplayName("Wall command scenarios")
     void runWallCommands() {
-        runApplicationWithCommands(commandLinePosts());
-        runApplicationWithCommands(commandLineWall());
+        runApplicationWithCommands(postsGivenFromCommandLine());
+        runApplicationWithCommands(wallCommandFromCommandLine());
 
         assertFalse(getCommandResults().isEmpty());
     }
@@ -66,7 +64,7 @@ class SocialNetworkingIT {
     @Test()
     @DisplayName("Post command scenarios")
     void runPostsCommands() {
-        runApplicationWithCommands(commandLinePosts());
+        runApplicationWithCommands(postsGivenFromCommandLine());
 
         assertTrue(getCommandResults().isEmpty());
     }
@@ -76,8 +74,12 @@ class SocialNetworkingIT {
     void invalidCommand() {
         inputStream.stream("invalid command given");
         application.run();
-        final List<String> commandResults =getCommandResults();
+        final List<String> commandResults = getCommandResults();
         assertTrue(commandResults.isEmpty());
+    }
+
+    private void validateExpectedMessageInCommandResult(MessageData expectedMessage, List<String> commandResults) {
+        assertTrue(commandResults.contains(expectedMessage.message), "Message [" + expectedMessage.message + "] was not found in output [" + commandResults + "]");
     }
 
     private void runApplicationWithCommands(List<String> commands) {
@@ -90,9 +92,7 @@ class SocialNetworkingIT {
     }
 
     private List<String> getCommandResults() {
-        final List<String> commandResults = extractCommandResults(byteArrayOutputStream.toString());
-        System.out.println(commandResults);
-        return commandResults;
+        return extractCommandResults(byteArrayOutputStream.toString());
     }
 
     private List<String> extractCommandResults(String printedMessages) {
@@ -100,6 +100,7 @@ class SocialNetworkingIT {
 
         return of(withoutApplicationMessages.split("\\n")).stream()
                                                           .filter(x -> !x.isEmpty())
+                                                          .map(String::trim)
                                                           .collect(Collectors.toList());
     }
 
