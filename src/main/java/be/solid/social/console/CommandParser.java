@@ -16,16 +16,49 @@ import static java.util.Optional.of;
  * - Command wall: \<user name> wall
  */
 public class CommandParser {
+    private final CommandFactory commandFactory;
 
+    public CommandParser(CommandFactory commandFactory) {
+        this.commandFactory = commandFactory;
+    }
 
-    public static Optional<Command> parseCommand(String line) {
+    public Optional<Usecase> parseCommand(String line) {
         if (isInvalidInput(line)) return empty();
 
         final Tokens tokens = Tokens.create(line, SPACE);
-        return buildCommand(tokens);
+        return buildUseCase(tokens);
     }
 
-    private static Optional<Command> buildCommand(Tokens tokens) {
+    private static ViewWall buildViewWallCommand(Tokens tokens) {
+        final String first = tokens.getFirst();
+        return buildViewWall(first);
+    }
+
+    private static Following buildFollowingCommand(Tokens tokens) {
+        return Following.newBuilder()
+                        .withUser(tokens.getFirst())
+                        .withSubscriptionTopic(tokens.getThird())
+                        .build();
+    }
+
+    private static boolean isInvalidInput(String line) {
+        return line.trim()
+                   .isEmpty() || line.startsWith(ARROW) || line.startsWith(FOLLOWS) || line.startsWith(WALL);
+    }
+
+    private static ViewTimeLine buildViewTimeLine(String user) {
+        return ViewTimeLine.newBuilder()
+                           .withUser(user.trim())
+                           .build();
+    }
+
+    private static ViewWall buildViewWall(String user) {
+        return ViewWall.newBuilder()
+                       .withUser(user.trim())
+                       .build();
+    }
+
+    private Optional<Usecase> buildUseCase(Tokens tokens) {
         if (tokens.hasSingleToken()) return of(buildViewTimeLine(tokens.getFirst()));
         if (tokens.hasTwoTokens()) {
             if (tokens.doesSecondTokenMatch(WALL)) {
@@ -41,42 +74,12 @@ public class CommandParser {
         return empty();
     }
 
-    private static ViewWall buildViewWallCommand(Tokens tokens) {
-        final String first = tokens.getFirst();
-        return buildViewWall(first);
-    }
-
-    private static Posting buildPostCommand(Tokens tokens) {
+    private Posting buildPostCommand(Tokens tokens) {
         final String content = tokens.getContentAfterSecondToken();
-        return Posting.newBuilder()
-                      .withActor(tokens.getFirst())
-                      .withContent(content)
-                      .build();
-    }
-
-    private static Following buildFollowingCommand(Tokens tokens) {
-        return Following.newBuilder()
-                        .withUser(tokens.getFirst())
-                        .withSubscriptionTopic(tokens.getThird())
-                        .build();
-    }
-
-    private static boolean isInvalidInput(String line) {
-        return line.trim()
-                   .isEmpty() || line.startsWith(ARROW) || line.startsWith(FOLLOWS) || line.startsWith(WALL);
-    }
-
-
-    private static ViewTimeLine buildViewTimeLine(String user) {
-        return ViewTimeLine.newBuilder()
-                           .withUser(user.trim())
-                           .build();
-    }
-
-    private static ViewWall buildViewWall(String user) {
-        return ViewWall.newBuilder()
-                       .withUser(user.trim())
-                       .build();
+        return commandFactory.buildPostCommand()
+                             .withActor(tokens.getFirst())
+                             .withContent(content)
+                             .build();
     }
 
 

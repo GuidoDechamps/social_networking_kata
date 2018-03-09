@@ -3,7 +3,6 @@ package be.solid.social.impl;
 import java.time.Instant;
 
 class MessagePost {
-
     public final String user;
     public final String content;
     public final Instant creationTime;

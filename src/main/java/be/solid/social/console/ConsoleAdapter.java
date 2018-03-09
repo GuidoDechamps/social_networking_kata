@@ -1,7 +1,6 @@
 package be.solid.social.console;
 
-import be.solid.social.usecase.Command;
-import be.solid.social.usecase.SocialNetworkUseCases;
+import be.solid.social.usecase.Usecase;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -12,17 +11,17 @@ import static be.solid.social.console.CommandTokens.EXIT;
 //TODO refactor class. to many responsibilities
 public class ConsoleAdapter {
 
-    private final SocialNetworkUseCases socialNetworkUseCases;
     private final ConsoleMessagePrinter messagePrinter;
     private final InputStream inputStream;
+    private final CommandParser commandParser;
     private SCAN_STATE state;
 
 
-    public ConsoleAdapter(SocialNetworkUseCases socialNetworkUseCases, InputStream inputStream, ConsoleMessagePrinter messagePrinter) {
-        this.socialNetworkUseCases = socialNetworkUseCases;
+    public ConsoleAdapter(InputStream inputStream, ConsoleMessagePrinter messagePrinter, CommandParser commandParser) {
         this.messagePrinter = messagePrinter;
         this.inputStream = inputStream;
 
+        this.commandParser = commandParser;
     }
 
     public void scanContinuously() {
@@ -60,8 +59,8 @@ public class ConsoleAdapter {
 
     private void processCommand(String line) {
         messagePrinter.printCommand(line);
-        final Optional<Command> command = CommandParser.parseCommand(line);
-        command.ifPresentOrElse(this::executeCommand, printNoCommand(line));
+        final Optional<Usecase> usecase = commandParser.parseCommand(line);
+        usecase.ifPresentOrElse(this::executeCommand, printNoCommand(line));
     }
 
     private Runnable printNoCommand(String line) {
@@ -69,9 +68,9 @@ public class ConsoleAdapter {
 
     }
 
-    private void executeCommand(Command command) {
-        final Object result = command.execute(socialNetworkUseCases);
-        messagePrinter.printResult(result);
+    private void executeCommand(Usecase usecase) {
+        usecase.execute();
+        messagePrinter.printResult("fix me");
 
     }
 

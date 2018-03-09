@@ -1,10 +1,11 @@
 package be.solid.social.usecase;
 
-public class Posting implements Command<Void> {
-    public final String content;
-    public final String actor;
+public class Posting extends Command {
+    private final String content;
+    private final String actor;
 
-    private Posting(Builder builder) {
+    private Posting(Posting.Builder builder) {
+        super(builder);
         content = builder.content;
         actor = builder.actor;
     }
@@ -14,12 +15,11 @@ public class Posting implements Command<Void> {
     }
 
     @Override
-    public Void execute(SocialNetworkUseCases useCases) {
-        useCases.execute(this);
-        return null;
+    public void execute() {
+        publishingService.post(actor, content);
     }
 
-    public static final class Builder {
+    public static class Builder extends Command.Builder<Posting.Builder> {
         private String content;
         private String actor;
 
@@ -38,6 +38,11 @@ public class Posting implements Command<Void> {
 
         public Posting build() {
             return new Posting(this);
+        }
+
+        @Override
+        protected Builder self() {
+            return this;
         }
     }
 

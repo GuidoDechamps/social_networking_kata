@@ -1,10 +1,11 @@
 package be.solid.social.usecase;
 
-public class Following implements Command<Void> {
-    public final String user;
-    public final String subscriptionTopic;
+public class Following extends Command {
+    private final String user;
+    private final String subscriptionTopic;
 
     private Following(Builder builder) {
+        super(builder);
         user = builder.user;
         subscriptionTopic = builder.subscriptionTopic;
     }
@@ -14,12 +15,11 @@ public class Following implements Command<Void> {
     }
 
     @Override
-    public Void execute(SocialNetworkUseCases useCases) {
-        useCases.execute(this);
-        return null;
+    public void execute() {
+        publishingService.subscribe(user, subscriptionTopic);
     }
 
-    public static final class Builder {
+    public final static class Builder extends Command.Builder<Following.Builder> {
         private String user;
         private String subscriptionTopic;
 
@@ -38,6 +38,11 @@ public class Following implements Command<Void> {
 
         public Following build() {
             return new Following(this);
+        }
+
+        @Override
+        protected Following.Builder self() {
+            return this;
         }
     }
 }

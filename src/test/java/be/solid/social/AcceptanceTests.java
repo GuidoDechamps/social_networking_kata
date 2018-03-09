@@ -1,13 +1,14 @@
 package be.solid.social;
 
 
+import be.solid.social.domain.PublishingService;
 import be.solid.social.domain.ReaderService;
 import be.solid.social.impl.Messages;
 import be.solid.social.impl.PrintMessagesDecorator;
 import be.solid.social.usecase.*;
 import be.solid.social.validators.MessageValidator;
-import be.solid.social.validators.TimeLineValidator;
 import be.solid.social.validators.ValidatorFactory;
+import be.solid.social.validators.WallResultValidator;
 import be.solid.social.validators.WallValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,21 +25,24 @@ import static be.solid.social.TestScenarios.*;
 @DisplayName("Social Kata Acceptance tests")
 public class AcceptanceTests {
 
-    private final SocialNetworkUseCases useCases;
+    private final ReaderService readerService;
+    private final PublishingService publishingService;
     private final WallValidator wallValidator;
     private final MessageValidator singleMessageValidator;
-    private final TimeLineValidator timeLineValidator;
+    private final PresenterSpy presenterSpy;
+    private final WallResultValidator wallResultValidator;
     private final ManualClock clock;
 
 
     public AcceptanceTests(Messages messages, ManualClock clock) {
-        final ReaderService readerService = PrintMessagesDecorator.decorate(messages, clock);
         this.clock = clock;
-        this.useCases = new SocialNetworkUseCases(messages, readerService);
+        this.publishingService = messages;
+        this.presenterSpy = new PresenterSpy();
+        this.readerService = PrintMessagesDecorator.decorate(messages, clock);
 
-        final ValidatorFactory validatorFactory = new ValidatorFactory(clock);
+        final ValidatorFactory validatorFactory = new ValidatorFactory(clock, presenterSpy);
         this.singleMessageValidator = validatorFactory.createSingleMessageValidator();
-        this.timeLineValidator = validatorFactory.createTimeLineValidator(sequenceOfPosts());
+        this.wallResultValidator = validatorFactory.createTimeLineValidator(sequenceOfPosts());
         this.wallValidator = validatorFactory.createWallValidator(sequenceOfPosts());
     }
 
@@ -53,9 +57,9 @@ public class AcceptanceTests {
     void postMessage(final MessageData input) {
         post(input);
 
-        final List<Event> messages = read(input.sender);
+        viewTimeLine(input.sender);
 
-        singleMessageValidator.validateSingleMessage(messages, input);
+        singleMessageValidator.validateSingleMessage(input);
     }
 
     @ParameterizedTest()
@@ -64,9 +68,9 @@ public class AcceptanceTests {
     void readTimeLineFromSender(final String sender) {
         postAllExampleMessages();
 
-        final List<Event> messages = read(sender);
+        viewTimeLine(sender);
 
-        timeLineValidator.validate(sender, messages);
+        wallResultValidator.validate(sender);
     }
 
     @ParameterizedTest()
@@ -75,9 +79,9 @@ public class AcceptanceTests {
     void wallWithNoSubscriptions(final String sender) {
         postAllExampleMessages();
 
-        final List<Event> messages = wall(sender);
+        wall(sender);
 
-        timeLineValidator.validate(sender, messages);
+        wallResultValidator.validate(sender);
 
     }
 
@@ -87,9 +91,9 @@ public class AcceptanceTests {
         postAllExampleMessages();
         follow(CHARLIE, ALICE);
 
-        final List<Event> messages = wall(CHARLIE);
+        wall(CHARLIE);
 
-        wallValidator.validate(messages, ALICE, CHARLIE);
+        wallValidator.validate(ALICE, CHARLIE);
 
     }
 
@@ -99,9 +103,9 @@ public class AcceptanceTests {
         postAllExampleMessages();
         follow(ALICE, BOB);
 
-        final List<Event> messages = wall(ALICE);
+        wall(ALICE);
 
-        wallValidator.validate(messages, BOB, ALICE);
+        wallValidator.validate(BOB, ALICE);
 
     }
 
@@ -112,9 +116,9 @@ public class AcceptanceTests {
         follow(BOB, CHARLIE);
         follow(BOB, ALICE);
 
-        final List<Event> messages = wall(BOB);
+        wall(BOB);
 
-        wallValidator.validate(messages, CHARLIE, BOB, ALICE);
+        wallValidator.validate(CHARLIE, BOB, ALICE);
 
     }
 
@@ -132,45 +136,51 @@ public class AcceptanceTests {
 
     private void follow(String user, String target) {
         final Following following = createFollowingCommand(user, target);
-        useCases.execute(following);
+        following.execute();
     }
 
     private Following createFollowingCommand(String user, String target) {
         return Following.newBuilder()
+                        .withPublishingService(publishingService)
                         .withUser(user)
                         .withSubscriptionTopic(target)
                         .build();
     }
 
-    private List<Event> read(String sender) {
+    private void viewTimeLine(String sender) {
         final ViewTimeLine viewTimeLine = createViewTimeLineCommand(sender);
-        return useCases.execute(viewTimeLine);
+        viewTimeLine.execute();
     }
 
     private ViewTimeLine createViewTimeLineCommand(String sender) {
         return ViewTimeLine.newBuilder()
+                           .withReaderService(readerService)
+                           .withPresenter(presenterSpy)
                            .withUser(sender)
                            .build();
     }
 
-    private List<Event> wall(String sender) {
+    private void wall(String sender) {
         final ViewWall viewWallCommand = createViewWallCommand(sender);
-        return useCases.execute(viewWallCommand);
+        viewWallCommand.execute();
     }
 
     private ViewWall createViewWallCommand(String sender) {
         return ViewWall.newBuilder()
+                       .withReaderService(readerService)
+                       .withPresenter(presenterSpy)
                        .withUser(sender)
                        .build();
     }
 
     private void post(MessageData input) {
         final Posting postCommand = createPostCommand(input);
-        useCases.execute(postCommand);
+        postCommand.execute();
     }
 
     private Posting createPostCommand(MessageData input) {
         return Posting.newBuilder()
+                      .withPublishingService(publishingService)
                       .withActor(input.sender)
                       .withContent(input.message)
                       .build();
