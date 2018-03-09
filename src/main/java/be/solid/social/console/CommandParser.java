@@ -29,13 +29,13 @@ public class CommandParser {
         return buildUseCase(tokens);
     }
 
-    private static ViewWall buildViewWallCommand(Tokens tokens) {
+    private  ViewWall buildViewWallCommand(Tokens tokens) {
         final String first = tokens.getFirst();
         return buildViewWall(first);
     }
 
-    private static Following buildFollowingCommand(Tokens tokens) {
-        return Following.newBuilder()
+    private  Following buildFollowingCommand(Tokens tokens) {
+        return commandFactory.followingBuilder()
                         .withUser(tokens.getFirst())
                         .withSubscriptionTopic(tokens.getThird())
                         .build();
@@ -46,14 +46,14 @@ public class CommandParser {
                    .isEmpty() || line.startsWith(ARROW) || line.startsWith(FOLLOWS) || line.startsWith(WALL);
     }
 
-    private static ViewTimeLine buildViewTimeLine(String user) {
-        return ViewTimeLine.newBuilder()
+    private  ViewTimeLine buildViewTimeLine(String user) {
+        return commandFactory.viewTimeLineBuilder()
                            .withUser(user.trim())
                            .build();
     }
 
-    private static ViewWall buildViewWall(String user) {
-        return ViewWall.newBuilder()
+    private  ViewWall buildViewWall(String user) {
+        return commandFactory.viewWallBuilder()
                        .withUser(user.trim())
                        .build();
     }
@@ -76,7 +76,7 @@ public class CommandParser {
 
     private Posting buildPostCommand(Tokens tokens) {
         final String content = tokens.getContentAfterSecondToken();
-        return commandFactory.buildPostCommand()
+        return commandFactory.postBuilder()
                              .withActor(tokens.getFirst())
                              .withContent(content)
                              .build();

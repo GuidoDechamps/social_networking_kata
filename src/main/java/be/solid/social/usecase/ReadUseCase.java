@@ -9,8 +9,8 @@ abstract class ReadUseCase implements Usecase {
     protected final ReaderService readerService;
 
     protected ReadUseCase(Builder<?> builder) {
-        requireNonNull(builder.presenter);
-        requireNonNull(builder.readerService);
+        requireNonNull(builder.presenter,"Presenter not set");
+        requireNonNull(builder.readerService,"ReaderService not set");
         this.presenter = builder.presenter;
         this.readerService = builder.readerService;
     }

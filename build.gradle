@@ -7,11 +7,6 @@ buildscript {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = 4.2
-}
-
-
 
 apply plugin: 'java'
 apply plugin: 'application'
@@ -45,7 +40,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.google.guava:guava:23.0"
+    compile "com.google.guava:guava:24.0-jre"
     testCompile("org.junit.jupiter:junit-jupiter-api:5.0.0")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.0")
     testCompile("org.junit.jupiter:junit-jupiter-params:5.0.0")

@@ -22,12 +22,15 @@ class CommandParserTest {
     private PublishingSpy publishingSpy;
     private ReaderSpy readerSpy;
     private CommandParser parser;
+    private Presenter presenter;
 
     @BeforeEach
     void setUp() {
         publishingSpy = new PublishingSpy();
         readerSpy = new ReaderSpy();
-        parser = new CommandParser(new CommandFactory(publishingSpy, null, readerSpy));
+        presenter = new PresenterSpy();
+        final CommandFactory commandFactory = new CommandFactory(publishingSpy, presenter, readerSpy);
+        parser = new CommandParser(commandFactory);
     }
 
     @ParameterizedTest()

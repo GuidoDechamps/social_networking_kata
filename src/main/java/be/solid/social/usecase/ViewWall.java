@@ -1,7 +1,6 @@
 package be.solid.social.usecase;
 
 import be.solid.social.domain.Message;
-import be.solid.social.domain.ReaderService;
 
 import java.util.List;
 
@@ -9,15 +8,16 @@ import static be.solid.social.usecase.EventMapper.map;
 import static java.util.Objects.requireNonNull;
 
 public class ViewWall extends ReadUseCase {
-    private final ReaderService readerService;
     private final String user;
 
     private ViewWall(Builder builder) {
         super(builder);
-        requireNonNull(builder.readerService);
         requireNonNull(builder.user);
-        readerService = builder.readerService;
         user = builder.user;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     @Override
@@ -27,12 +27,7 @@ public class ViewWall extends ReadUseCase {
         this.presenter.allEvents(events);
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
     public static final class Builder extends ReadUseCase.Builder<Builder> {
-        private ReaderService readerService;
         private String user;
 
         private Builder() {
@@ -40,11 +35,6 @@ public class ViewWall extends ReadUseCase {
 
         public Builder withUser(String val) {
             user = val;
-            return this;
-        }
-
-        public Builder withReaderService(ReaderService readerService) {
-            this.readerService = readerService;
             return this;
         }
 

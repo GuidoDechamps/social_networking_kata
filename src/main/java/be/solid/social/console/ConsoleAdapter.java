@@ -60,7 +60,7 @@ public class ConsoleAdapter {
     private void processCommand(String line) {
         messagePrinter.printCommand(line);
         final Optional<Usecase> usecase = commandParser.parseCommand(line);
-        usecase.ifPresentOrElse(this::executeCommand, printNoCommand(line));
+        usecase.ifPresentOrElse(this::executeUsecase, printNoCommand(line));
     }
 
     private Runnable printNoCommand(String line) {
@@ -68,10 +68,8 @@ public class ConsoleAdapter {
 
     }
 
-    private void executeCommand(Usecase usecase) {
+    private void executeUsecase(Usecase usecase) {
         usecase.execute();
-        messagePrinter.printResult("fix me");
-
     }
 
 

@@ -2,15 +2,15 @@ package be.solid.social.usecase;
 
 import be.solid.social.domain.PublishingService;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
-public abstract class Command implements Usecase {
+abstract class Command implements Usecase {
     protected final Presenter presenter;
     protected final PublishingService publishingService;
 
-    protected Command(Builder<?> builder) {
-        nonNull(builder.presenter);
-        nonNull(builder.publishingService);
+    Command(Builder<?> builder) {
+        requireNonNull(builder.presenter, "No presenter set");
+        requireNonNull(builder.publishingService, "No publishing service set");
         this.presenter = builder.presenter;
         this.publishingService = builder.publishingService;
     }
