@@ -79,7 +79,11 @@ class SocialNetworkingIT {
     }
 
     private void validateExpectedMessageInCommandResult(MessageData expectedMessage, List<String> commandResults) {
-        assertTrue(commandResults.contains(expectedMessage.message), "Message [" + expectedMessage.message + "] was not found in output [" + commandResults + "]");
+        assertTrue(commandResults.contains(expectedMessage.message), buildMessageNotFound(expectedMessage, commandResults));
+    }
+
+    private String buildMessageNotFound(MessageData expectedMessage, List<String> commandResults) {
+        return "Message [" + expectedMessage.message + "] was not found in output [" + commandResults + "]";
     }
 
     private void runApplicationWithCommands(List<String> commands) {

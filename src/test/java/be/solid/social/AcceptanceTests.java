@@ -1,7 +1,6 @@
 package be.solid.social;
 
 
-import be.solid.social.domain.PublishingService;
 import be.solid.social.domain.ReaderService;
 import be.solid.social.impl.Messages;
 import be.solid.social.impl.PrintMessagesDecorator;
@@ -25,20 +24,18 @@ import static be.solid.social.TestScenarios.*;
 @DisplayName("Social Kata Acceptance tests")
 public class AcceptanceTests {
 
-    private final ReaderService readerService;
-    private final PublishingService publishingService;
     private final WallValidator wallValidator;
     private final MessageValidator singleMessageValidator;
-    private final PresenterSpy presenterSpy;
     private final WallResultValidator wallResultValidator;
     private final ManualClock clock;
+    private final CommandFactory commandFactory;
 
 
     public AcceptanceTests(Messages messages, ManualClock clock) {
         this.clock = clock;
-        this.publishingService = messages;
-        this.presenterSpy = new PresenterSpy();
-        this.readerService = PrintMessagesDecorator.decorate(messages, clock);
+        final PresenterSpy presenterSpy = new PresenterSpy();
+        final ReaderService readerService = PrintMessagesDecorator.decorate(messages, clock);
+        this.commandFactory = new CommandFactory(messages, presenterSpy, readerService);
 
         final ValidatorFactory validatorFactory = new ValidatorFactory(clock, presenterSpy);
         this.singleMessageValidator = validatorFactory.createSingleMessageValidator();
@@ -140,11 +137,10 @@ public class AcceptanceTests {
     }
 
     private Following createFollowingCommand(String user, String target) {
-        return Following.newBuilder()
-                        .withPublishingService(publishingService)
-                        .withUser(user)
-                        .withSubscriptionTopic(target)
-                        .build();
+        return commandFactory.followingBuilder()
+                             .withUser(user)
+                             .withSubscriptionTopic(target)
+                             .build();
     }
 
     private void viewTimeLine(String sender) {
@@ -153,11 +149,9 @@ public class AcceptanceTests {
     }
 
     private ViewTimeLine createViewTimeLineCommand(String sender) {
-        return ViewTimeLine.newBuilder()
-                           .withReaderService(readerService)
-                           .withPresenter(presenterSpy)
-                           .withUser(sender)
-                           .build();
+        return commandFactory.viewTimeLineBuilder()
+                             .withUser(sender)
+                             .build();
     }
 
     private void wall(String sender) {
@@ -166,11 +160,9 @@ public class AcceptanceTests {
     }
 
     private ViewWall createViewWallCommand(String sender) {
-        return ViewWall.newBuilder()
-                       .withReaderService(readerService)
-                       .withPresenter(presenterSpy)
-                       .withUser(sender)
-                       .build();
+        return commandFactory.viewWallBuilder()
+                             .withUser(sender)
+                             .build();
     }
 
     private void post(MessageData input) {
@@ -179,11 +171,10 @@ public class AcceptanceTests {
     }
 
     private Posting createPostCommand(MessageData input) {
-        return Posting.newBuilder()
-                      .withPublishingService(publishingService)
-                      .withActor(input.sender)
-                      .withContent(input.message)
-                      .build();
+        return commandFactory.postBuilder()
+                             .withActor(input.sender)
+                             .withContent(input.message)
+                             .build();
     }
 
     private void postAllExampleMessages() {
